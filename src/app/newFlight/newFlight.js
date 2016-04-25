@@ -9,6 +9,6 @@ angular.module('newFlight', ['resources.flights'])
 
 .controller('NewFlightCtrl', ['$scope', 'Flights', function($scope, Flights){
   $scope.submit = function() {
-    Flights.newFlight($scope.flight)
+    Flights.newFlight($scope.rocket_id, $scope.flight, $scope.motor)
   };
 }]);

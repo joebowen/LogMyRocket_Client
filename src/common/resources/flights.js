@@ -13,9 +13,11 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.addFlight = function(flight){
+  Flights.newFlight = function(rocket_id, flight, motor){
     return $http.post('https://logmyrocket.info/api/flights',{
-        'flight_data': flight
+        'rocket_id': rocket_id,
+        'flight_data': flight,
+        'motor_data': motor
       },
       {
         withCredentials: true,
@@ -41,9 +43,11 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.updateFlight = function(flight_id, flight){
+  Flights.updateFlight = function(flight_id, rocket_id, flight, motor){
     return $http.put('https://logmyrocket.info/api/flights/' + flight_id,{
-        'flight_data': flight
+        'rocket_id': rocket_id,
+        'flight_data': flight,
+        'motor_data': motor
       },
       {
         withCredentials: true,

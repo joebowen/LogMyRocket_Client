@@ -26,7 +26,7 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "<h3>My Flights</h3>\n" +
     "\n" +
     "<div ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
-    "  {{flight.id}}\n" +
+    "  {{flight.flight_id}}\n" +
     "</div>");
 }]);
 
@@ -89,6 +89,22 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"form-group\">\n" +
+    "    <label for=\"inputRocketId\" class=\"col-sm-2 control-label\">\n" +
+    "      Rocket ID:\n" +
+    "    </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketId\" ng-model=\"rocket_id\" />\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <label for=\"inputMotorId\" class=\"col-sm-2 control-label\">\n" +
+    "      Motor ID:\n" +
+    "    </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputMotorId\" ng-model=\"motor.motor_id\" />\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-offset-2 col-sm-10\">\n" +
     "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
     "        Start Flight\n" +
@@ -112,6 +128,6 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
     "<h3>My Rockets</h3>\n" +
     "\n" +
     "<div ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
-    "  {{rocket.id}}\n" +
+    "  {{rocket.rocket_id}}\n" +
     "</div>");
 }]);

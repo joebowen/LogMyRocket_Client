@@ -60,7 +60,7 @@ angular.module('security.service', [
 
     // Attempt to authenticate a user by the given username and password
     login: function(username, password) {
-      var request = $http.post('https://logmyrocket.info/api/login', {'username': username, 'password': password});
+      var request = $http.post('https://logmyrocket.info/api/login?', {'username': username, 'password': password});
       return request.then(function(response) {
         service.currentUser = response.data;
         $cookieStore.put("token", response.data.token);
