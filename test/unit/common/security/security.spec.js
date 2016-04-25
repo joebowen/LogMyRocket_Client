@@ -93,15 +93,6 @@ describe('security', function() {
         expect($location.path).toHaveBeenCalledWith('/');
       });
     });
-
-    it('redirects to the path specified in the first parameter', function() {
-      inject(function($location) {
-        spyOn($location, 'path');
-        service.logout('/other/path');
-        $httpBackend.flush();
-        expect($location.path).toHaveBeenCalledWith('/other/path');
-      });
-    });
   });
 
   describe("currentUser", function() {

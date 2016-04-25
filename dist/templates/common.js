@@ -14,8 +14,8 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "            {{authError}}\n" +
     "        </div>\n" +
     "        <div class=\"alert alert-info\">Please enter your login details</div>\n" +
-    "        <label>E-mail</label>\n" +
-    "        <input name=\"login\" type=\"email\" ng-model=\"user.email\" required autofocus>\n" +
+    "        <label>Username</label>\n" +
+    "        <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
     "        <label>Password</label>\n" +
     "        <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
     "    </div>\n" +
@@ -32,9 +32,6 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav pull-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
-    "  <li ng-show=\"isAuthenticated()\">\n" +
-    "      <a href=\"#\">{{currentUser.firstName}} {{currentUser.lastName}}</a>\n" +
-    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"logout()\">Log out</button>\n" +

@@ -1,19 +1,19 @@
 {
-  "author": "Pawel Kozlowski & Peter Bacon Darwin",
-  "name": "angular-app",
-  "homepage": "https://github.com/angular-app/angular-app",
+  "author": "Joe Bowen",
+  "name": "LogMyRocket",
+  "homepage": "https://github.com/joebowen/LogMyRocket_Client",
   "version": "0.0.1-SNAPSHOT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:angular-app/angular-app.git"
+    "url": "git@github.com:joebowen/LogMyRocket_Client.git"
   },
   "bugs": {
-    "url": "https://github.com/angular-app/angular-app/issues"
+    "url": "https://github.com/joebowen/LogMyRocket_Client/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/angular-app/angular-app/master/LICENSE"
+      "url": "https://github.com/joebowen/LogMyRocket_Client/master/LICENSE"
     }
   ],
   "engines": {

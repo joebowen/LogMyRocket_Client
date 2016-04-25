@@ -2,10 +2,11 @@
 angular.module('security.service', [
   'security.retryQueue',    // Keeps track of failed requests that need to be retried once the user logs in
   'security.login',         // Contains the login form template and controller
-  'ui.bootstrap.dialog'     // Used to display the login form as a modal dialog.
+  'ui.bootstrap.dialog',    // Used to display the login form as a modal dialog.
+  'ngCookies'               // Used to store current authentication token.
 ])
 
-.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$dialog', function($http, $q, $location, queue, $dialog) {
+.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$dialog', '$cookieStore', function($http, $q, $location, queue, $dialog, $cookieStore) {
 
   // Redirect to the given url (defaults to '/')
   function redirect(url) {
@@ -57,11 +58,12 @@ angular.module('security.service', [
       openLoginDialog();
     },
 
-    // Attempt to authenticate a user by the given email and password
-    login: function(email, password) {
-      var request = $http.post('/login', {email: email, password: password});
+    // Attempt to authenticate a user by the given username and password
+    login: function(username, password) {
+      var request = $http.post('https://logmyrocket.info/api/login', {'username': username, 'password': password});
       return request.then(function(response) {
-        service.currentUser = response.data.user;
+        service.currentUser = response.data;
+        $cookieStore.put("token", response.data.token);
         if ( service.isAuthenticated() ) {
           closeLoginDialog(true);
         }
@@ -77,10 +79,9 @@ angular.module('security.service', [
 
     // Logout the current user and redirect
     logout: function(redirectTo) {
-      $http.post('/logout').then(function() {
-        service.currentUser = null;
-        redirect(redirectTo);
-      });
+      currentUser: null;
+      $cookieStore.remove("token");
+      service.showLogin();
     },
 
     // Ask the backend to see if a user is already authenticated - this may be from a previous session.
@@ -88,10 +89,7 @@ angular.module('security.service', [
       if ( service.isAuthenticated() ) {
         return $q.when(service.currentUser);
       } else {
-        return $http.get('/current-user').then(function(response) {
-          service.currentUser = response.data.user;
-          return service.currentUser;
-        });
+        service.showLogin();
       }
     },
 
@@ -100,12 +98,21 @@ angular.module('security.service', [
 
     // Is the current user authenticated?
     isAuthenticated: function(){
-      return !!service.currentUser;
+      // TODO: Add check for valid, non-expired token.
+      return !!$cookieStore.get("token");
     },
     
     // Is the current user an adminstrator?
     isAdmin: function() {
       return !!(service.currentUser && service.currentUser.admin);
+    },
+
+    getToken: function() {
+      if ( service.isAuthenticated() ) {
+        return $cookieStore.get("token");
+      } else {
+        service.showLogin();
+      }
     }
   };
 

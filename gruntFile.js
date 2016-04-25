@@ -83,7 +83,7 @@ module.exports = function (grunt) {
           banner: "<%= banner %>"
         },
         src:['<%= src.js %>', '<%= src.jsTpl %>'],
-        dest:'<%= distdir %>/<%= pkg.name %>.js'
+        dest:'<%= distdir %>/static/<%= pkg.name %>.js'
       },
       index: {
         src: ['src/index.html'],
