@@ -1,31 +1,42 @@
-<div class="navbar" ng-controller="HeaderCtrl">
-    <div class="navbar-inner">
-        <div class="row">
-            <a class="brand" ng-click="home()">Log My Rocket</a>
-            <ul class="nav" ng-show="isAuthenticated()">
-                <li ng-class="{active:isNavbarActive('rockets')}"><a href="/rockets">My Rockets</a></li>
-                <li ng-class="{active:isNavbarActive('flights')}"><a href="/flights">My Flights</a></li>
-            </ul>
-            <ul class="nav pull-right" ng-show="hasPendingRequests()">
-                <li class="divider-vertical"></li>
-                <li><a href="#"><img src="/static/img/spinner.gif"></a></li>
-            </ul>
-        </div>
-        <div class="row">
-            <login-toolbar></login-toolbar>
-            <ul ng-show="isAuthenticated()" class="nav pull-left">
-                <li>
-                    <form class="navbar-form">
-                        <a class="btn" href="/rockets/add-rocket">Add Rocket</a>
-                    </form>
-                </li>
-                <li>
-                    <form class="navbar-form">
-                        <a class="btn" href="/flights/new-flight">New Flight</a>
-                    </form>
-                </li>
-            </ul>
-        </div>
+<div class="navbar navbar-default" ng-controller="HeaderCtrl">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Log My Rocket</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li ng-class="{active:isNavbarActive('rockets')}" ng-show="isAuthenticated()"><a href="/rockets">My Rockets</a></li>
+        <li ng-class="{active:isNavbarActive('flights')}" ng-show="isAuthenticated()"><a href="/flights">My Flights</a></li>
+
+        <li>
+          <ul class="nav" ng-show="hasPendingRequests()">
+            <li class="divider-vertical"></li>
+            <li><a href="#"><img src="/static/img/spinner.gif"></a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-left">
+        <li ng-show="isAuthenticated()">
+          <form class="navbar-form">
+            <a class="btn btn-default" href="/rockets/add-rocket">Add Rocket</a>
+          </form>
+        </li>
+        <li ng-show="isAuthenticated()">
+          <form class="navbar-form">
+            <a class="btn btn-default" href="/flights/new-flight">New Flight</a>
+          </form>
+        </li>
+      </ul>
+      <login-toolbar></login-toolbar>
     </div>
     <div>
         <ul class="breadcrumb">
@@ -38,4 +49,5 @@
             </li>
         </ul>
     </div>
+  </div>
 </div>

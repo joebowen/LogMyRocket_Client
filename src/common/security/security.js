@@ -2,11 +2,10 @@
 angular.module('security.service', [
   'security.retryQueue',    // Keeps track of failed requests that need to be retried once the user logs in
   'security.login',         // Contains the login form template and controller
-  'ui.bootstrap.dialog',    // Used to display the login form as a modal dialog.
-  'ngCookies'               // Used to store current authentication token.
+  'ui.bootstrap'
 ])
 
-.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$dialog', '$cookieStore', function($http, $q, $location, queue, $dialog, $cookieStore) {
+.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$uibModal', '$window', function($http, $q, $location, queue, $uibModal, $window) {
 
   // Redirect to the given url (defaults to '/')
   function redirect(url) {
@@ -20,8 +19,12 @@ angular.module('security.service', [
     if ( loginDialog ) {
       throw new Error('Trying to open a dialog that is already open!');
     }
-    loginDialog = $dialog.dialog();
-    loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
+    loginDialog = $uibModal.open({
+      templateUrl: 'security/login/form.tpl.html',
+      controller: 'LoginFormController'
+    });
+
+    loginDialog.result.then(onLoginDialogClose);
   }
   function closeLoginDialog(success) {
     if (loginDialog) {
@@ -63,7 +66,7 @@ angular.module('security.service', [
       var request = $http.post('https://logmyrocket.info/api/login?', {'username': username, 'password': password});
       return request.then(function(response) {
         service.currentUser = response.data;
-        $cookieStore.put("token", response.data.token);
+        $window.localStorage['jwtToken'] = response.data.token;
         if ( service.isAuthenticated() ) {
           closeLoginDialog(true);
         }
@@ -80,7 +83,7 @@ angular.module('security.service', [
     // Logout the current user and redirect
     logout: function(redirectTo) {
       currentUser: null;
-      $cookieStore.remove("token");
+      $window.localStorage.removeItem('jwtToken');
       service.showLogin();
     },
 
@@ -98,8 +101,19 @@ angular.module('security.service', [
 
     // Is the current user authenticated?
     isAuthenticated: function(){
-      // TODO: Add check for valid, non-expired token.
-      return !!$cookieStore.get("token");
+      var token = service.getToken();
+      if(token) {
+        var params = service.parseJwt(token);
+        return Math.round(new Date().getTime() / 1000) <= params.exp;
+      } else {
+        return false;
+      }
+    },
+
+    parseJwt: function(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse($window.atob(base64));
     },
     
     // Is the current user an adminstrator?
@@ -108,11 +122,7 @@ angular.module('security.service', [
     },
 
     getToken: function() {
-      if ( service.isAuthenticated() ) {
-        return $cookieStore.get("token");
-      } else {
-        service.showLogin();
-      }
+      return $window.localStorage['jwtToken'];
     }
   };
 

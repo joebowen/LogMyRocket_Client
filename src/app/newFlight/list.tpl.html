@@ -1,30 +1,45 @@
 <h3>New Flight</h3>
 
 <form class="form-horizontal" role="form">
-  <div class="form-group">
-    <label for="inputFlightName" class="col-sm-2 control-label">
-      Flight Name:
-    </label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputFlightName" ng-model="flight.name" />
-    </div>
+  <label for="inputRocketName" class="col-sm-2 control-label">Rocket Name:</label>
+  <div class="btn-group col-sm-10" uib-dropdown>
+    <button id="inputRocketName" type="button" class="btn btn-primary" uib-dropdown-toggle ng-disabled="disabled">
+      {{ rocket.rocket_data.name }}
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="inputRocketName">
+      <li ng-repeat="item in rockets" role="menuitem"><a ng-click="rocketItemSelected(item)">{{ item.rocket_data.name }}</a></li>
+    </ul>
   </div>
-  <div class="form-group">
-    <label for="inputRocketId" class="col-sm-2 control-label">
-      Rocket ID:
-    </label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputRocketId" ng-model="rocket_id" />
-    </div>
+
+
+  <label class="col-sm-2 control-label">Motor Configuration:</label>
+  <div class="col-sm-10">
+    <ul class="list-group" aria-labelledby="inputMotorConfig">
+      <li class="list-group-item" ng-repeat="stage in rocket.rocket_data.motors track by $index">
+        <label>Stage ({{ $index + 1 }}):  </label>
+        <label>Number of motors: {{ stage.length }}</label>
+        <ul>
+          <li ng-repeat="motor in stage track by $index" role="menuitem">
+            <label>Motor ({{ $index + 1 }}) </label>
+            <label>Diameter: {{ motor.diameter }}mm</label>
+            <div class="btn-group" uib-dropdown>
+              <button id="motorBtn" type="button" class="btn btn-primary" uib-dropdown-toggle ng-disabled="disabled">
+                {{ motor.motor.name }}
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" uib-dropdown-menu  aria-labelledby="motorBtn">
+                <li ng-repeat="motor in allMotors" role="menuitem">
+                  <a ng-click="addMotorToStage($parent.$parent.$index, $parent.$index, motor)">{{ motor.name }}</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
   </div>
-  <div class="form-group">
-    <label for="inputMotorId" class="col-sm-2 control-label">
-      Motor ID:
-    </label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputMotorId" ng-model="motor.motor_id" />
-    </div>
-  </div>
+
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button ng-click="submit()" class="btn btn-default">

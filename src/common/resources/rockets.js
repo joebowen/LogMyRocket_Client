@@ -1,4 +1,4 @@
-angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security', function ($http, security) {
+angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security', '$location', function ($http, security, $location) {
   var Rockets = {};
 
   Rockets.getAll = function(){
@@ -7,9 +7,6 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
         }
-      })
-      .then(function(response){
-        return response.data;
       });
   };
 
@@ -25,7 +22,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
         }
       })
       .then(function(response){
-        return response.data;
+        $location.path('/rockets');
       });
   };
 

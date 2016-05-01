@@ -1,4 +1,4 @@
-angular.module('resources.flights', []).factory('Flights', ['$http', 'security', function ($http, security) {
+angular.module('resources.flights', []).factory('Flights', ['$http', 'security', '$location', function ($http, security, $location) {
   var Flights = {};
 
   Flights.getAll = function(){
@@ -13,9 +13,9 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.newFlight = function(rocket_id, flight, motor){
+  Flights.newFlight = function(rocket, flight, motor){
     return $http.post('https://logmyrocket.info/api/flights',{
-        'rocket_id': rocket_id,
+        'rocket_data': rocket,
         'flight_data': flight,
         'motor_data': motor
       },
@@ -27,7 +27,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
         }
       })
       .then(function(response){
-        return response.data;
+        $location.path('/flights');
       });
   };
 

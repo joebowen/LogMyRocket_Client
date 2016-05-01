@@ -6,7 +6,9 @@ angular.module('rockets', ['resources.rockets'])
     controller:'RocketsListCtrl',
     resolve:{
       rockets:['Rockets', function(Rockets){
-        return Rockets.getAll();
+        return Rockets.getAll().then(function(response){
+          return response.data;
+        });
       }]
     }
   });

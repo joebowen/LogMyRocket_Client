@@ -1,5 +1,6 @@
 angular.module('app', [
   'ngRoute',
+  'ngAnimate',
   'newFlight',
   'addRocket',
   'flights',
@@ -8,9 +9,9 @@ angular.module('app', [
   'services.i18nNotifications',
   'services.httpRequestTracker',
   'security',
-  'directives.crud',
   'templates.app',
-  'templates.common']);
+  'templates.common',
+  'ui.bootstrap']);
 
 //TODO: move those messages to a separate module
 angular.module('app').constant('I18N.MESSAGES', {
@@ -32,6 +33,8 @@ angular.module('app').config(['$routeProvider', '$locationProvider', function ($
   $locationProvider.html5Mode(true);
   $routeProvider.otherwise({redirectTo:'/rockets'});
 }]);
+
+angular.module('app').run(['$route', function() {}]);
 
 angular.module('app').run(['security', function(security) {
   // Get the current user when the application starts

@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-04-24
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-05-01
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2016 Joe Bowen;
  * Licensed MIT
@@ -13,12 +13,51 @@ angular.module('addRocket', ['resources.rockets'])
 }])
 
 .controller('AddRocketCtrl', ['$scope', 'Rockets', function($scope, Rockets){
+  $scope.recoveries = ['Parachute', 'Streamer', 'Tumble', 'Helicopter', 'Dual-Parachute'];
+  $scope.rods = ['1/8"', '3/16"', '1/4"', 'T1010 (rail)'];
+  $scope.motorSizes = ['13', '18', '24', '29', '38', '54'];
+  $scope.clusterSizes = _.range(1,35);
+
+  $scope.rocket = {};
+
+  $scope.rocket.preflight = [];
+  $scope.rocket.motors = [];
+  $scope.rocket.motors.push({'diameter': $scope.motorSizes[0]});
+
+  $scope.rocket.recovery = $scope.recoveries[0];
+  $scope.rocket.rod = $scope.rods[0];
+
+  $scope.recoveryItemSelected = function (item) {
+    $scope.rocket.recovery = item;
+  };
+
+  $scope.rodItemSelected = function (item) {
+    $scope.rocket.rod = item;
+  };
+
   $scope.submit = function() {
-    Rockets.addRocket($scope.rocket)
+    Rockets.addRocket($scope.rocket);
+  };
+
+  $scope.addPreFlightRow = function() {
+    $scope.rocket.preflight.push("");
+  };
+
+  $scope.addStage = function() {
+    $scope.rocket.motors.push({'diameter': $scope.motorSizes[0]});
+  };
+
+  $scope.clusterSizeSelected = function(stageIndex, size) {
+    $scope.rocket.motors[stageIndex] = new Array(size);
+  };
+
+  $scope.addMotorSizeToStage = function(stageIndex, motorIndex, diameter) {
+    $scope.rocket.motors[stageIndex][motorIndex]['diameter'] = diameter;
   };
 }]);
 angular.module('app', [
   'ngRoute',
+  'ngAnimate',
   'newFlight',
   'addRocket',
   'flights',
@@ -27,9 +66,9 @@ angular.module('app', [
   'services.i18nNotifications',
   'services.httpRequestTracker',
   'security',
-  'directives.crud',
   'templates.app',
-  'templates.common']);
+  'templates.common',
+  'ui.bootstrap']);
 
 //TODO: move those messages to a separate module
 angular.module('app').constant('I18N.MESSAGES', {
@@ -51,6 +90,8 @@ angular.module('app').config(['$routeProvider', '$locationProvider', function ($
   $locationProvider.html5Mode(true);
   $routeProvider.otherwise({redirectTo:'/rockets'});
 }]);
+
+angular.module('app').run(['$route', function() {}]);
 
 angular.module('app').run(['security', function(security) {
   // Get the current user when the application starts
@@ -123,9 +164,35 @@ angular.module('newFlight', ['resources.flights'])
   });
 }])
 
-.controller('NewFlightCtrl', ['$scope', 'Flights', function($scope, Flights){
+.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', function($scope, Flights, Rockets){
+  $scope.allMotors = [
+    {
+      name: "test_motor",
+      id : "1"
+    }
+  ];
+
+  $scope.flight = {};
+
+  Rockets.getAll()
+    .then(function(response){
+      $scope.rockets = response.data;
+      $scope.rocket = $scope.rockets[0];
+      $scope.motor = $scope.rockets[0].rocket_data.motors;
+    });
+
   $scope.submit = function() {
-    Flights.newFlight($scope.rocket_id, $scope.flight, $scope.motor)
+    $scope.flight.create = Date.now();
+    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor)
+  };
+
+  $scope.rocketItemSelected = function(rocket) {
+    $scope.rocket = rocket;
+    $scope.motor = rocket.rocket_data.motors;
+  };
+
+  $scope.addMotorToStage = function(stageIndex, motorIndex, motor) {
+    $scope.motor[stageIndex][motorIndex]['motor'] = motor;
   };
 }]);
 angular.module('rockets', ['resources.rockets'])
@@ -136,7 +203,9 @@ angular.module('rockets', ['resources.rockets'])
     controller:'RocketsListCtrl',
     resolve:{
       rockets:['Rockets', function(Rockets){
-        return Rockets.getAll();
+        return Rockets.getAll().then(function(response){
+          return response.data;
+        });
       }]
     }
   });
@@ -145,449 +214,7 @@ angular.module('rockets', ['resources.rockets'])
 .controller('RocketsListCtrl', ['$scope', 'rockets', function($scope, rockets){
   $scope.rockets = rockets;
 }]);
-angular.module('directives.crud', ['directives.crud.buttons', 'directives.crud.edit']);
-
-angular.module('directives.crud.buttons', [])
-
-.directive('crudButtons', function () {
-  return {
-    restrict:'E',
-    replace:true,
-    template:
-      '<div>' +
-      '  <button type="button" class="btn btn-primary save" ng-disabled="!canSave()" ng-click="save()">Save</button>' +
-      '  <button type="button" class="btn btn-warning revert" ng-click="revertChanges()" ng-disabled="!canRevert()">Revert changes</button>'+
-      '  <button type="button" class="btn btn-danger remove" ng-click="remove()" ng-show="canRemove()">Remove</button>'+
-      '</div>'
-  };
-});
-angular.module('directives.crud.edit', [])
-
-// Apply this directive to an element at or below a form that will manage CRUD operations on a resource.
-// - The resource must expose the following instance methods: $saveOrUpdate(), $id() and $remove()
-.directive('crudEdit', ['$parse', function($parse) {
-  return {
-    // We ask this directive to create a new child scope so that when we add helper methods to the scope
-    // it doesn't make a mess of the parent scope.
-    // - Be aware that if you write to the scope from within the form then you must remember that there is a child scope at the point
-    scope: true,
-    // We need access to a form so we require a FormController from this element or a parent element
-    require: '^form',
-    // This directive can only appear as an attribute
-    link: function(scope, element, attrs, form) {
-      // We extract the value of the crudEdit attribute
-      // - it should be an assignable expression evaluating to the model (resource) that is going to be edited
-      var resourceGetter = $parse(attrs.crudEdit);
-      var resourceSetter = resourceGetter.assign;
-      // Store the resource object for easy access
-      var resource = resourceGetter(scope);
-      // Store a copy for reverting the changes
-      var original = angular.copy(resource);
-
-      var checkResourceMethod = function(methodName) {
-        if ( !angular.isFunction(resource[methodName]) ) {
-          throw new Error('crudEdit directive: The resource must expose the ' + methodName + '() instance method');
-        }
-      };
-      checkResourceMethod('$saveOrUpdate');
-      checkResourceMethod('$id');
-      checkResourceMethod('$remove');
-
-      // This function helps us extract the callback functions from the directive attributes
-      var makeFn = function(attrName) {
-        var fn = scope.$eval(attrs[attrName]);
-        if ( !angular.isFunction(fn) ) {
-          throw new Error('crudEdit directive: The attribute "' + attrName + '" must evaluate to a function');
-        }
-        return fn;
-      };
-      // Set up callbacks with fallback
-      // onSave attribute -> onSave scope -> noop
-      var userOnSave = attrs.onSave ? makeFn('onSave') : ( scope.onSave || angular.noop );
-      var onSave = function(result, status, headers, config) {
-        // Reset the original to help with reverting and pristine checks
-        original = result;
-        userOnSave(result, status, headers, config);
-      };
-      // onRemove attribute -> onRemove scope -> onSave attribute -> onSave scope -> noop
-      var onRemove = attrs.onRemove ? makeFn('onRemove') : ( scope.onRemove || onSave );
-      // onError attribute -> onError scope -> noop
-      var onError = attrs.onError ? makeFn('onError') : ( scope.onError || angular.noop );
-
-      // The following functions should be triggered by elements on the form
-      // - e.g. ng-click="save()"
-      scope.save = function() {
-        resource.$saveOrUpdate(onSave, onSave, onError, onError);
-      };
-      scope.revertChanges = function() {
-        resource = angular.copy(original);
-        resourceSetter(scope, resource);
-        form.$setPristine();
-      };
-      scope.remove = function() {
-        if(resource.$id()) {
-          resource.$remove(onRemove, onError);
-        } else {
-          onRemove();
-        }
-      };
-
-      // The following functions can be called to modify the behaviour of elements in the form
-      // - e.g. ng-disable="!canSave()"
-      scope.canSave = function() {
-        return form.$valid && !angular.equals(resource, original);
-      };
-      scope.canRevert = function() {
-        return !angular.equals(resource, original);
-      };
-      scope.canRemove = function() {
-        return resource.$id();
-      };
-      /**
-       * Get the CSS classes for this item, to be used by the ng-class directive
-       * @param {string} fieldName The name of the field on the form, for which we want to get the CSS classes
-       * @return {object} A hash where each key is a CSS class and the corresponding value is true if the class is to be applied.
-       */
-      scope.getCssClasses = function(fieldName) {
-        var ngModelController = form[fieldName];
-        return {
-          error: ngModelController.$invalid && !angular.equals(resource, original),
-          success: ngModelController.$valid && !angular.equals(resource, original)
-        };
-      };
-      /**
-       * Whether to show an error message for the specified error
-       * @param {string} fieldName The name of the field on the form, of which we want to know whether to show the error
-       * @param  {string} error - The name of the error as given by a validation directive
-       * @return {Boolean} true if the error should be shown
-       */
-      scope.showError = function(fieldName, error) {
-        return form[fieldName].$error[error];
-      };
-    }
-  };
-}]);
-angular.module('directives.gravatar', [])
-
-// A simple directive to display a gravatar image given an email
-.directive('gravatar', ['md5', function(md5) {
-
-  return {
-    restrict: 'E',
-    template: '<img ng-src="http://www.gravatar.com/avatar/{{hash}}{{getParams}}"/>',
-    replace: true,
-    scope: {
-      email: '=',
-      size: '=',
-      defaultImage: '=',
-      forceDefault: '='
-    },
-    link: function(scope, element, attrs) {
-      scope.options = {};
-      scope.$watch('email', function(email) {
-        if ( email ) {
-          scope.hash = md5(email.trim().toLowerCase());
-        }
-      });
-      scope.$watch('size', function(size) {
-        scope.options.s = (angular.isNumber(size)) ? size : undefined;
-        generateParams();
-      });
-      scope.$watch('forceDefault', function(forceDefault) {
-        scope.options.f = forceDefault ? 'y' : undefined;
-        generateParams();
-      });
-      scope.$watch('defaultImage', function(defaultImage) {
-        scope.options.d = defaultImage ? defaultImage : undefined;
-        generateParams();
-      });
-      function generateParams() {
-        var options = [];
-        scope.getParams = '';
-        angular.forEach(scope.options, function(value, key) {
-          if ( value ) {
-            options.push(key + '=' + encodeURIComponent(value));
-          }
-        });
-        if ( options.length > 0 ) {
-          scope.getParams = '?' + options.join('&');
-        }
-      }
-    }
-  };
-}])
-
-.factory('md5', function() {
-  function md5cycle(x, k) {
-    var a = x[0],
-      b = x[1],
-      c = x[2],
-      d = x[3];
-
-    a = ff(a, b, c, d, k[0], 7, -680876936);
-    d = ff(d, a, b, c, k[1], 12, -389564586);
-    c = ff(c, d, a, b, k[2], 17, 606105819);
-    b = ff(b, c, d, a, k[3], 22, -1044525330);
-    a = ff(a, b, c, d, k[4], 7, -176418897);
-    d = ff(d, a, b, c, k[5], 12, 1200080426);
-    c = ff(c, d, a, b, k[6], 17, -1473231341);
-    b = ff(b, c, d, a, k[7], 22, -45705983);
-    a = ff(a, b, c, d, k[8], 7, 1770035416);
-    d = ff(d, a, b, c, k[9], 12, -1958414417);
-    c = ff(c, d, a, b, k[10], 17, -42063);
-    b = ff(b, c, d, a, k[11], 22, -1990404162);
-    a = ff(a, b, c, d, k[12], 7, 1804603682);
-    d = ff(d, a, b, c, k[13], 12, -40341101);
-    c = ff(c, d, a, b, k[14], 17, -1502002290);
-    b = ff(b, c, d, a, k[15], 22, 1236535329);
-
-    a = gg(a, b, c, d, k[1], 5, -165796510);
-    d = gg(d, a, b, c, k[6], 9, -1069501632);
-    c = gg(c, d, a, b, k[11], 14, 643717713);
-    b = gg(b, c, d, a, k[0], 20, -373897302);
-    a = gg(a, b, c, d, k[5], 5, -701558691);
-    d = gg(d, a, b, c, k[10], 9, 38016083);
-    c = gg(c, d, a, b, k[15], 14, -660478335);
-    b = gg(b, c, d, a, k[4], 20, -405537848);
-    a = gg(a, b, c, d, k[9], 5, 568446438);
-    d = gg(d, a, b, c, k[14], 9, -1019803690);
-    c = gg(c, d, a, b, k[3], 14, -187363961);
-    b = gg(b, c, d, a, k[8], 20, 1163531501);
-    a = gg(a, b, c, d, k[13], 5, -1444681467);
-    d = gg(d, a, b, c, k[2], 9, -51403784);
-    c = gg(c, d, a, b, k[7], 14, 1735328473);
-    b = gg(b, c, d, a, k[12], 20, -1926607734);
-
-    a = hh(a, b, c, d, k[5], 4, -378558);
-    d = hh(d, a, b, c, k[8], 11, -2022574463);
-    c = hh(c, d, a, b, k[11], 16, 1839030562);
-    b = hh(b, c, d, a, k[14], 23, -35309556);
-    a = hh(a, b, c, d, k[1], 4, -1530992060);
-    d = hh(d, a, b, c, k[4], 11, 1272893353);
-    c = hh(c, d, a, b, k[7], 16, -155497632);
-    b = hh(b, c, d, a, k[10], 23, -1094730640);
-    a = hh(a, b, c, d, k[13], 4, 681279174);
-    d = hh(d, a, b, c, k[0], 11, -358537222);
-    c = hh(c, d, a, b, k[3], 16, -722521979);
-    b = hh(b, c, d, a, k[6], 23, 76029189);
-    a = hh(a, b, c, d, k[9], 4, -640364487);
-    d = hh(d, a, b, c, k[12], 11, -421815835);
-    c = hh(c, d, a, b, k[15], 16, 530742520);
-    b = hh(b, c, d, a, k[2], 23, -995338651);
-
-    a = ii(a, b, c, d, k[0], 6, -198630844);
-    d = ii(d, a, b, c, k[7], 10, 1126891415);
-    c = ii(c, d, a, b, k[14], 15, -1416354905);
-    b = ii(b, c, d, a, k[5], 21, -57434055);
-    a = ii(a, b, c, d, k[12], 6, 1700485571);
-    d = ii(d, a, b, c, k[3], 10, -1894986606);
-    c = ii(c, d, a, b, k[10], 15, -1051523);
-    b = ii(b, c, d, a, k[1], 21, -2054922799);
-    a = ii(a, b, c, d, k[8], 6, 1873313359);
-    d = ii(d, a, b, c, k[15], 10, -30611744);
-    c = ii(c, d, a, b, k[6], 15, -1560198380);
-    b = ii(b, c, d, a, k[13], 21, 1309151649);
-    a = ii(a, b, c, d, k[4], 6, -145523070);
-    d = ii(d, a, b, c, k[11], 10, -1120210379);
-    c = ii(c, d, a, b, k[2], 15, 718787259);
-    b = ii(b, c, d, a, k[9], 21, -343485551);
-
-    x[0] = add32(a, x[0]);
-    x[1] = add32(b, x[1]);
-    x[2] = add32(c, x[2]);
-    x[3] = add32(d, x[3]);
-
-  }
-
-  function cmn(q, a, b, x, s, t) {
-    a = add32(add32(a, q), add32(x, t));
-    return add32((a << s) | (a >>> (32 - s)), b);
-  }
-
-  function ff(a, b, c, d, x, s, t) {
-    return cmn((b & c) | ((~b) & d), a, b, x, s, t);
-  }
-
-  function gg(a, b, c, d, x, s, t) {
-    return cmn((b & d) | (c & (~d)), a, b, x, s, t);
-  }
-
-  function hh(a, b, c, d, x, s, t) {
-    return cmn(b ^ c ^ d, a, b, x, s, t);
-  }
-
-  function ii(a, b, c, d, x, s, t) {
-    return cmn(c ^ (b | (~d)), a, b, x, s, t);
-  }
-
-  function md51(s) {
-    txt = '';
-    var n = s.length,
-      state = [1732584193, -271733879, -1732584194, 271733878],
-      i;
-    for (i = 64; i <= s.length; i += 64) {
-      md5cycle(state, md5blk(s.substring(i - 64, i)));
-    }
-    s = s.substring(i - 64);
-    var tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    for (i = 0; i < s.length; i++) {
-      tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
-    }
-    tail[i >> 2] |= 0x80 << ((i % 4) << 3);
-    if (i > 55) {
-      md5cycle(state, tail);
-      for (i = 0; i < 16; i++) {
-        tail[i] = 0;
-      }
-    }
-    tail[14] = n * 8;
-    md5cycle(state, tail);
-    return state;
-  }
-
-  /* there needs to be support for Unicode here,
-   * unless we pretend that we can redefine the MD-5
-   * algorithm for multi-byte characters (perhaps
-   * by adding every four 16-bit characters and
-   * shortening the sum to 32 bits). Otherwise
-   * I suggest performing MD-5 as if every character
-   * was two bytes--e.g., 0040 0025 = @%--but then
-   * how will an ordinary MD-5 sum be matched?
-   * There is no way to standardize text to something
-   * like UTF-8 before transformation; speed cost is
-   * utterly prohibitive. The JavaScript standard
-   * itself needs to look at this: it should start
-   * providing access to strings as preformed UTF-8
-   * 8-bit unsigned value arrays.
-   */
-
-  function md5blk(s) { /* I figured global was faster.   */
-    var md5blks = [],
-      i; /* Andy King said do it this way. */
-    for (i = 0; i < 64; i += 4) {
-      md5blks[i >> 2] = s.charCodeAt(i) + (s.charCodeAt(i + 1) << 8) + (s.charCodeAt(i + 2) << 16) + (s.charCodeAt(i + 3) << 24);
-    }
-    return md5blks;
-  }
-
-  var hex_chr = '0123456789abcdef'.split('');
-
-  function rhex(n) {
-    var s = '', j = 0;
-    for (; j < 4; j++) {
-      s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
-    }
-    return s;
-  }
-
-  function hex(x) {
-    for (var i = 0; i < x.length; i++) {
-      x[i] = rhex(x[i]);
-    }
-    return x.join('');
-  }
-
-  function md5(s) {
-    return hex(md51(s));
-  }
-
-  /* this function is much faster,
-  so if possible we use it. Some IEs
-  are the only ones I know of that
-  need the idiotic second function,
-  generated by an if clause.  */
-
-  add32 = function(a, b) {
-    return (a + b) & 0xFFFFFFFF;
-  };
-
-  if (md5('hello') !== '5d41402abc4b2a76b9719d911017c592') {
-    add32 = function (x, y) {
-      var lsw = (x & 0xFFFF) + (y & 0xFFFF),
-        msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-      return (msw << 16) | (lsw & 0xFFFF);
-    };
-  }
-
-  return md5;
-});
-angular.module('directives.modal', []).directive('modal', ['$parse',function($parse) {
-  var backdropEl;
-  var body = angular.element(document.getElementsByTagName('body')[0]);
-  var defaultOpts = {
-    backdrop: true,
-    escape: true
-  };
-  return {
-    restrict: 'ECA',
-    link: function(scope, elm, attrs) {
-      var opts = angular.extend(defaultOpts, scope.$eval(attrs.uiOptions || attrs.bsOptions || attrs.options));
-      var shownExpr = attrs.modal || attrs.show;
-      var setClosed;
-
-      if (attrs.close) {
-        setClosed = function() {
-          scope.$apply(attrs.close);
-        };
-      } else {
-        setClosed = function() {
-          scope.$apply(function() {
-            $parse(shownExpr).assign(scope, false);
-          });
-        };
-      }
-      elm.addClass('modal');
-
-      if (opts.backdrop && !backdropEl) {
-        backdropEl = angular.element('<div class="modal-backdrop"></div>');
-        backdropEl.css('display','none');
-        body.append(backdropEl);
-      }
-
-      function setShown(shown) {
-        scope.$apply(function() {
-          model.assign(scope, shown);
-        });
-      }
-
-      function escapeClose(evt) {
-        if (evt.which === 27) { setClosed(); }
-      }
-      function clickClose() {
-        setClosed();
-      }
-
-      function close() {
-        if (opts.escape) { body.unbind('keyup', escapeClose); }
-        if (opts.backdrop) {
-          backdropEl.css('display', 'none').removeClass('in');
-          backdropEl.unbind('click', clickClose);
-        }
-        elm.css('display', 'none').removeClass('in');
-        body.removeClass('modal-open');
-      }
-      function open() {
-        if (opts.escape) { body.bind('keyup', escapeClose); }
-        if (opts.backdrop) {
-          backdropEl.css('display', 'block').addClass('in');
-          backdropEl.bind('click', clickClose);
-        }
-        elm.css('display', 'block').addClass('in');
-        body.addClass('modal-open');
-      }
-
-      scope.$watch(shownExpr, function(isShown, oldShown) {
-        if (isShown) {
-          open();
-        } else {
-          close();
-        }
-      });
-    }
-  };
-}]);
-
-angular.module('resources.flights', []).factory('Flights', ['$http', 'security', function ($http, security) {
+angular.module('resources.flights', []).factory('Flights', ['$http', 'security', '$location', function ($http, security, $location) {
   var Flights = {};
 
   Flights.getAll = function(){
@@ -602,9 +229,9 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.newFlight = function(rocket_id, flight, motor){
+  Flights.newFlight = function(rocket, flight, motor){
     return $http.post('https://logmyrocket.info/api/flights',{
-        'rocket_id': rocket_id,
+        'rocket_data': rocket,
         'flight_data': flight,
         'motor_data': motor
       },
@@ -616,7 +243,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
         }
       })
       .then(function(response){
-        return response.data;
+        $location.path('/flights');
       });
   };
 
@@ -664,7 +291,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
 
   return Flights;
 }]);
-angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security', function ($http, security) {
+angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security', '$location', function ($http, security, $location) {
   var Rockets = {};
 
   Rockets.getAll = function(){
@@ -673,9 +300,6 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
         }
-      })
-      .then(function(response){
-        return response.data;
       });
   };
 
@@ -691,7 +315,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
         }
       })
       .then(function(response){
-        return response.data;
+        $location.path('/rockets');
       });
   };
 
@@ -810,7 +434,7 @@ angular.module('security.interceptor', ['security.retryQueue'])
 
 // We have to add the interceptor to the queue as a string because the interceptor depends upon service instances that are not available in the config block.
 .config(['$httpProvider', function($httpProvider) {
-  $httpProvider.responseInterceptors.push('securityInterceptor');
+  $httpProvider.interceptors.push('securityInterceptor');
 }]);
 angular.module('security.login.form', ['services.localizedMessages'])
 
@@ -955,11 +579,10 @@ angular.module('security.retryQueue', [])
 angular.module('security.service', [
   'security.retryQueue',    // Keeps track of failed requests that need to be retried once the user logs in
   'security.login',         // Contains the login form template and controller
-  'ui.bootstrap.dialog',    // Used to display the login form as a modal dialog.
-  'ngCookies'               // Used to store current authentication token.
+  'ui.bootstrap'
 ])
 
-.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$dialog', '$cookieStore', function($http, $q, $location, queue, $dialog, $cookieStore) {
+.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$uibModal', '$window', function($http, $q, $location, queue, $uibModal, $window) {
 
   // Redirect to the given url (defaults to '/')
   function redirect(url) {
@@ -973,8 +596,12 @@ angular.module('security.service', [
     if ( loginDialog ) {
       throw new Error('Trying to open a dialog that is already open!');
     }
-    loginDialog = $dialog.dialog();
-    loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
+    loginDialog = $uibModal.open({
+      templateUrl: 'security/login/form.tpl.html',
+      controller: 'LoginFormController'
+    });
+
+    loginDialog.result.then(onLoginDialogClose);
   }
   function closeLoginDialog(success) {
     if (loginDialog) {
@@ -1016,7 +643,7 @@ angular.module('security.service', [
       var request = $http.post('https://logmyrocket.info/api/login?', {'username': username, 'password': password});
       return request.then(function(response) {
         service.currentUser = response.data;
-        $cookieStore.put("token", response.data.token);
+        $window.localStorage['jwtToken'] = response.data.token;
         if ( service.isAuthenticated() ) {
           closeLoginDialog(true);
         }
@@ -1033,7 +660,7 @@ angular.module('security.service', [
     // Logout the current user and redirect
     logout: function(redirectTo) {
       currentUser: null;
-      $cookieStore.remove("token");
+      $window.localStorage.removeItem('jwtToken');
       service.showLogin();
     },
 
@@ -1051,8 +678,19 @@ angular.module('security.service', [
 
     // Is the current user authenticated?
     isAuthenticated: function(){
-      // TODO: Add check for valid, non-expired token.
-      return !!$cookieStore.get("token");
+      var token = service.getToken();
+      if(token) {
+        var params = service.parseJwt(token);
+        return Math.round(new Date().getTime() / 1000) <= params.exp;
+      } else {
+        return false;
+      }
+    },
+
+    parseJwt: function(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse($window.atob(base64));
     },
     
     // Is the current user an adminstrator?
@@ -1061,11 +699,7 @@ angular.module('security.service', [
     },
 
     getToken: function() {
-      if ( service.isAuthenticated() ) {
-        return $cookieStore.get("token");
-      } else {
-        service.showLogin();
-      }
+      return $window.localStorage['jwtToken'];
     }
   };
 
@@ -1457,6 +1091,91 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "    <div class=\"col-sm-10\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketName\" ng-model=\"rocket.name\" />\n" +
     "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRecoveryMode\" class=\"col-sm-2 control-label\">Recovery Mode:</label>\n" +
+    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "      <button id=\"inputRecoveryMode\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "        {{ rocket.recovery }}\n" +
+    "        <span class=\"caret\"></span>\n" +
+    "      </button>\n" +
+    "      <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"inputRecoveryMode\">\n" +
+    "        <li ng-repeat=\"a in recoveries\" role=\"menuitem\"><a ng-click=\"recoveryItemSelected(a)\">{{a}}</a></li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRodSize\" class=\"col-sm-2 control-label\">Rod/Rail Size:</label>\n" +
+    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "      <button id=\"inputRodSize\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "        {{ rocket.rod }}\n" +
+    "        <span class=\"caret\"></span>\n" +
+    "      </button>\n" +
+    "      <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"inputRodSize\">\n" +
+    "        <li ng-repeat=\"a in rods\" role=\"menuitem\"><a ng-click=\"rodItemSelected(a)\">{{a}}</a></li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputMotorConfig\" class=\"col-sm-2 control-label\">Motor Configuration:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"stage in rocket.motors track by $index\">\n" +
+    "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
+    "          <label>Number of motors: </label>\n" +
+    "          <div class=\"btn-group\" uib-dropdown>\n" +
+    "            <button id=\"clusterSizeBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "              {{ stage.length }}\n" +
+    "              <span class=\"caret\"></span>\n" +
+    "            </button>\n" +
+    "            <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"clusterSizeBtn\">\n" +
+    "              <li ng-repeat=\"clusterSize in clusterSizes\" role=\"menuitem\">\n" +
+    "                <a ng-click=\"clusterSizeSelected($parent.$index, clusterSize)\">{{ clusterSize }}</a>\n" +
+    "              </li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "          <ul>\n" +
+    "            <li ng-repeat=\"motor in stage track by $index\" role=\"menuitem\">\n" +
+    "              <label>Motor ({{ $index + 1 }}) </label>\n" +
+    "              <label>Diameter: </label>\n" +
+    "              <div class=\"btn-group\" uib-dropdown>\n" +
+    "                <button id=\"motorSizeBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "                  {{ motor }}\n" +
+    "                  <span class=\"caret\"></span>\n" +
+    "                </button>\n" +
+    "                <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorSizeBtn\">\n" +
+    "                  <li ng-repeat=\"motorSize in motorSizes\" role=\"menuitem\">\n" +
+    "                    <a ng-click=\"addMotorSizeToStage($parent.$parent.$index, $parent.$index, motorSize)\">{{ motorSize }}</a>\n" +
+    "                  </li>\n" +
+    "                </ul>\n" +
+    "              </div>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "        <li class=\"list-group-item\">\n" +
+    "          <button id=\"inputMotorConfig\" type=\"button\" class=\"btn btn-primary\" ng-click=\"addStage()\">\n" +
+    "            Add Stage\n" +
+    "          </button>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-2 control-label\">Pre-Flight Checklist Items:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputPreFlightChecklist\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"a in rocket.preflight track by $index\">\n" +
+    "          <input type=\"text\" class=\"form-control\" ng-model=\"rocket.preflight[$index]\" />\n" +
+    "        </li>\n" +
+    "        <li class=\"list-group-item\">\n" +
+    "          <button id=\"inputPreFlightChecklist\" type=\"button\" class=\"btn btn-primary\" ng-click=\"addPreFlightRow()\">\n" +
+    "            Add Pre-Flight Checklist Item\n" +
+    "          </button>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputNotes\" class=\"col-sm-2 control-label\">Notes:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <textarea class=\"form-control\" rows=\"5\" id=\"inputNotes\" ng-model=\"rocket.notes\"></textarea>\n" +
+    "    </div>\n" +
+    "\n" +
     "  </div>\n" +
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-12\">\n" +
@@ -1472,41 +1191,55 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
   $templateCache.put("flights/list.tpl.html",
     "<h3>My Flights</h3>\n" +
     "\n" +
-    "<div ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
-    "  {{flight.flight_id}}\n" +
-    "</div>");
+    "<ul class=\"list-group\">\n" +
+    "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
+    "    {{ flight.flight_id }}\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/edit-flight?flight_id={{ flight.flight_id }}\">Edit Flight</a>\n" +
+    "  </li>\n" +
+    "</ul>");
 }]);
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("header.tpl.html",
-    "<div class=\"navbar\" ng-controller=\"HeaderCtrl\">\n" +
-    "    <div class=\"navbar-inner\">\n" +
-    "        <div class=\"row\">\n" +
-    "            <a class=\"brand\" ng-click=\"home()\">Log My Rocket</a>\n" +
-    "            <ul class=\"nav\" ng-show=\"isAuthenticated()\">\n" +
-    "                <li ng-class=\"{active:isNavbarActive('rockets')}\"><a href=\"/rockets\">My Rockets</a></li>\n" +
-    "                <li ng-class=\"{active:isNavbarActive('flights')}\"><a href=\"/flights\">My Flights</a></li>\n" +
-    "            </ul>\n" +
-    "            <ul class=\"nav pull-right\" ng-show=\"hasPendingRequests()\">\n" +
-    "                <li class=\"divider-vertical\"></li>\n" +
-    "                <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
-    "            </ul>\n" +
-    "        </div>\n" +
-    "        <div class=\"row\">\n" +
-    "            <login-toolbar></login-toolbar>\n" +
-    "            <ul ng-show=\"isAuthenticated()\" class=\"nav pull-left\">\n" +
-    "                <li>\n" +
-    "                    <form class=\"navbar-form\">\n" +
-    "                        <a class=\"btn\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "                    </form>\n" +
-    "                </li>\n" +
-    "                <li>\n" +
-    "                    <form class=\"navbar-form\">\n" +
-    "                        <a class=\"btn\" href=\"/flights/new-flight\">New Flight</a>\n" +
-    "                    </form>\n" +
-    "                </li>\n" +
-    "            </ul>\n" +
-    "        </div>\n" +
+    "<div class=\"navbar navbar-default\" ng-controller=\"HeaderCtrl\">\n" +
+    "  <div class=\"container-fluid\">\n" +
+    "    <div class=\"navbar-header\">\n" +
+    "      <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\" aria-expanded=\"false\">\n" +
+    "        <span class=\"sr-only\">Toggle navigation</span>\n" +
+    "        <span class=\"icon-bar\"></span>\n" +
+    "        <span class=\"icon-bar\"></span>\n" +
+    "        <span class=\"icon-bar\"></span>\n" +
+    "      </button>\n" +
+    "      <a class=\"navbar-brand\" href=\"#\">Log My Rocket</a>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <!-- Collect the nav links, forms, and other content for toggling -->\n" +
+    "    <div class=\"collapse navbar-collapse\">\n" +
+    "      <ul class=\"nav navbar-nav\">\n" +
+    "        <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
+    "        <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
+    "\n" +
+    "        <li>\n" +
+    "          <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
+    "            <li class=\"divider-vertical\"></li>\n" +
+    "            <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "\n" +
+    "      <ul class=\"nav navbar-nav navbar-left\">\n" +
+    "        <li ng-show=\"isAuthenticated()\">\n" +
+    "          <form class=\"navbar-form\">\n" +
+    "            <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
+    "          </form>\n" +
+    "        </li>\n" +
+    "        <li ng-show=\"isAuthenticated()\">\n" +
+    "          <form class=\"navbar-form\">\n" +
+    "            <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
+    "          </form>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "      <login-toolbar></login-toolbar>\n" +
     "    </div>\n" +
     "    <div>\n" +
     "        <ul class=\"breadcrumb\">\n" +
@@ -1519,6 +1252,7 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "            </li>\n" +
     "        </ul>\n" +
     "    </div>\n" +
+    "  </div>\n" +
     "</div>");
 }]);
 
@@ -1527,30 +1261,45 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "<h3>New Flight</h3>\n" +
     "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <label for=\"inputFlightName\" class=\"col-sm-2 control-label\">\n" +
-    "      Flight Name:\n" +
-    "    </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
-    "      <input type=\"text\" class=\"form-control\" id=\"inputFlightName\" ng-model=\"flight.name\" />\n" +
-    "    </div>\n" +
+    "  <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
+    "  <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "    <button id=\"inputRocketName\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "      {{ rocket.rocket_data.name }}\n" +
+    "      <span class=\"caret\"></span>\n" +
+    "    </button>\n" +
+    "    <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"inputRocketName\">\n" +
+    "      <li ng-repeat=\"item in rockets\" role=\"menuitem\"><a ng-click=\"rocketItemSelected(item)\">{{ item.rocket_data.name }}</a></li>\n" +
+    "    </ul>\n" +
     "  </div>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <label for=\"inputRocketId\" class=\"col-sm-2 control-label\">\n" +
-    "      Rocket ID:\n" +
-    "    </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
-    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketId\" ng-model=\"rocket_id\" />\n" +
-    "    </div>\n" +
+    "\n" +
+    "\n" +
+    "  <label class=\"col-sm-2 control-label\">Motor Configuration:</label>\n" +
+    "  <div class=\"col-sm-10\">\n" +
+    "    <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
+    "      <li class=\"list-group-item\" ng-repeat=\"stage in rocket.rocket_data.motors track by $index\">\n" +
+    "        <label>Stage ({{ $index + 1 }}):  </label>\n" +
+    "        <label>Number of motors: {{ stage.length }}</label>\n" +
+    "        <ul>\n" +
+    "          <li ng-repeat=\"motor in stage track by $index\" role=\"menuitem\">\n" +
+    "            <label>Motor ({{ $index + 1 }}) </label>\n" +
+    "            <label>Diameter: {{ motor.diameter }}mm</label>\n" +
+    "            <div class=\"btn-group\" uib-dropdown>\n" +
+    "              <button id=\"motorBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "                {{ motor.motor.name }}\n" +
+    "                <span class=\"caret\"></span>\n" +
+    "              </button>\n" +
+    "              <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorBtn\">\n" +
+    "                <li ng-repeat=\"motor in allMotors\" role=\"menuitem\">\n" +
+    "                  <a ng-click=\"addMotorToStage($parent.$parent.$index, $parent.$index, motor)\">{{ motor.name }}</a>\n" +
+    "                </li>\n" +
+    "              </ul>\n" +
+    "            </div>\n" +
+    "          </li>\n" +
+    "        </ul>\n" +
+    "      </li>\n" +
+    "    </ul>\n" +
     "  </div>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <label for=\"inputMotorId\" class=\"col-sm-2 control-label\">\n" +
-    "      Motor ID:\n" +
-    "    </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
-    "      <input type=\"text\" class=\"form-control\" id=\"inputMotorId\" ng-model=\"motor.motor_id\" />\n" +
-    "    </div>\n" +
-    "  </div>\n" +
+    "\n" +
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-offset-2 col-sm-10\">\n" +
     "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
@@ -1574,9 +1323,13 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
   $templateCache.put("rockets/list.tpl.html",
     "<h3>My Rockets</h3>\n" +
     "\n" +
-    "<div ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
-    "  {{rocket.rocket_id}}\n" +
-    "</div>");
+    "<ul class=\"list-group\">\n" +
+    "  <li class=\"list-group-item\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
+    "    {{ rocket.rocket_data.name }}\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/new-flight?rocket_id={{ rocket.rocket_id }}\">New Flight</a>\n" +
+    "  </li>\n" +
+    "</ul>\n" +
+    "");
 }]);
 
 angular.module('templates.common', ['security/login/form.tpl.html', 'security/login/toolbar.tpl.html']);
@@ -1584,34 +1337,33 @@ angular.module('templates.common', ['security/login/form.tpl.html', 'security/lo
 angular.module("security/login/form.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("security/login/form.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
-    "    <div class=\"modal-header\">\n" +
-    "        <h4>Sign in</h4>\n" +
+    "  <div class=\"modal-header\">\n" +
+    "    <h4>Sign in</h4>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-body\">\n" +
+    "    <div class=\"alert alert-warning\" ng-show=\"authReason\">\n" +
+    "      {{authReason}}\n" +
     "    </div>\n" +
-    "    <div class=\"modal-body\">\n" +
-    "        <div class=\"alert alert-warning\" ng-show=\"authReason\">\n" +
-    "            {{authReason}}\n" +
-    "        </div>\n" +
-    "        <div class=\"alert alert-error\" ng-show=\"authError\">\n" +
-    "            {{authError}}\n" +
-    "        </div>\n" +
-    "        <div class=\"alert alert-info\">Please enter your login details</div>\n" +
-    "        <label>Username</label>\n" +
-    "        <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
-    "        <label>Password</label>\n" +
-    "        <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
+    "    <div class=\"alert alert-error\" ng-show=\"authError\">\n" +
+    "      {{authError}}\n" +
     "    </div>\n" +
-    "    <div class=\"modal-footer\">\n" +
-    "        <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
-    "        <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
-    "        <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
-    "    </div>\n" +
-    "</form>\n" +
-    "");
+    "    <div class=\"alert alert-info\">Please enter your login details</div>\n" +
+    "    <label>Username</label>\n" +
+    "    <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
+    "    <label>Password</label>\n" +
+    "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-footer\">\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
+    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
+    "  </div>\n" +
+    "</form>");
 }]);
 
 angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("security/login/toolbar.tpl.html",
-    "<ul class=\"nav pull-right\">\n" +
+    "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
