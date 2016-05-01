@@ -246,6 +246,7 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
     "  <li class=\"list-group-item\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
     "    {{ rocket.rocket_data.name }}\n" +
     "    <a class=\"btn btn-default\" href=\"/flights/new-flight?rocket_id={{ rocket.rocket_id }}\">New Flight</a>\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/edit-rocket?rocket_id={{ rocket.rocket_id }}\">Edit Rocket</a>\n" +
     "  </li>\n" +
     "</ul>\n" +
     "");
