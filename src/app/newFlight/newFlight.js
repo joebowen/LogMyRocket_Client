@@ -1,4 +1,4 @@
-angular.module('newFlight', ['resources.flights'])
+angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight.motor_chooser_form'])
 
 .config(['$routeProvider', function($routeProvider){
   $routeProvider.when('/flights/new-flight', {
@@ -7,34 +7,53 @@ angular.module('newFlight', ['resources.flights'])
   });
 }])
 
-.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', function($scope, Flights, Rockets){
-  $scope.allMotors = [
-    {
-      name: "test_motor",
-      id : "1"
-    }
-  ];
-
+.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', '$uibModal', function($scope, Flights, Rockets, $uibModal){
   $scope.flight = {};
 
   Rockets.getAll()
     .then(function(response){
       $scope.rockets = response.data;
       $scope.rocket = $scope.rockets[0];
-      $scope.motor = $scope.rockets[0].rocket_data.motors;
+      $scope.motor_spec = $scope.rocket.rocket_data.motors;
     });
 
   $scope.submit = function() {
     $scope.flight.create = Date.now();
-    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor)
+    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor);
   };
 
   $scope.rocketItemSelected = function(rocket) {
     $scope.rocket = rocket;
-    $scope.motor = rocket.rocket_data.motors;
+    $scope.motor_spec = rocket.rocket_data.motors;
   };
 
-  $scope.addMotorToStage = function(stageIndex, motorIndex, motor) {
-    $scope.motor[stageIndex][motorIndex]['motor'] = motor;
+  var motorChooserDialog = null;
+  $scope.openMotorChooser = function(stageIndex, motorIndex, motorDia) {
+    if ( motorChooserDialog ) {
+      throw new Error('Trying to open a dialog that is already open!');
+    }
+    motorChooserDialog = $uibModal.open({
+      templateUrl: 'newFlight/motor_chooser_form.tpl.html',
+      controller: 'MotorChooserFormController',
+      resolve: {
+        stageIndex: function () { return stageIndex },
+        motorIndex: function () { return motorIndex },
+        motorDia:function () { return motorDia }
+      }
+    });
+
+    motorChooserDialog.result.then(onMotorChooserDialogClose);
   };
+
+  function closeMotorChooserDialog(success) {
+    if (motorChooserDialog) {
+      motorChooserDialog.close(success);
+    }
+  };
+
+  function onMotorChooserDialogClose(success) {
+    motorChooserDialog = null;
+    $scope.motor_spec[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
+  };
+
 }]);

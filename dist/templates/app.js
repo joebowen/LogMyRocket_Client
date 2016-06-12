@@ -1,4 +1,4 @@
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -199,19 +199,14 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "        <label>Stage ({{ $index + 1 }}):  </label>\n" +
     "        <label>Number of motors: {{ stage.length }}</label>\n" +
     "        <ul>\n" +
-    "          <li ng-repeat=\"motor in stage track by $index\" role=\"menuitem\">\n" +
+    "          <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
     "            <label>Motor ({{ $index + 1 }}) </label>\n" +
-    "            <label>Diameter: {{ motor.diameter }}mm</label>\n" +
-    "            <div class=\"btn-group\" uib-dropdown>\n" +
-    "              <button id=\"motorBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
-    "                {{ motor.motor.name }}\n" +
-    "                <span class=\"caret\"></span>\n" +
+    "            <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
+    "            <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "            <div class=\"btn-group\">\n" +
+    "              <button ng-click=\"openMotorChooser($parent.$index, $index, motor_spec.diameter)\" class=\"btn btn-primary\">\n" +
+    "                Pick Motor\n" +
     "              </button>\n" +
-    "              <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorBtn\">\n" +
-    "                <li ng-repeat=\"motor in allMotors\" role=\"menuitem\">\n" +
-    "                  <a ng-click=\"addMotorToStage($parent.$parent.$index, $parent.$index, motor)\">{{ motor.name }}</a>\n" +
-    "                </li>\n" +
-    "              </ul>\n" +
     "            </div>\n" +
     "          </li>\n" +
     "        </ul>\n" +
@@ -225,6 +220,26 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "        Start Flight\n" +
     "      </button>\n" +
     "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
+angular.module("newFlight/motor_chooser_form.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("newFlight/motor_chooser_form.tpl.html",
+    "<form name=\"form\" novalidate class=\"login-form\">\n" +
+    "  <div class=\"modal-header\">\n" +
+    "    <h4>Choose a motor</h4>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-body\">\n" +
+    "    <label for=\"multipleSelect\"> Multiple select: </label><br>\n" +
+    "    <select name=\"multipleSelect\" id=\"multipleSelect\" ng-model=\"data.multipleSelect\" multiple>\n" +
+    "      <option ng-repeat=\"motor in allMotors\" value=\"{{ motor }}\">{{ motor['manufacturer-abbrev'] }} - {{ motor['common-name'] }}</option>\n" +
+    "    </select>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-footer\">\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"choose()\" ng-disabled='form.$invalid'>Ok</button>\n" +
+    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);

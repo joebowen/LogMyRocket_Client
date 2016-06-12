@@ -20,19 +20,14 @@
         <label>Stage ({{ $index + 1 }}):  </label>
         <label>Number of motors: {{ stage.length }}</label>
         <ul>
-          <li ng-repeat="motor in stage track by $index" role="menuitem">
+          <li ng-repeat="motor_spec in stage track by $index" role="menuitem">
             <label>Motor ({{ $index + 1 }}) </label>
-            <label>Diameter: {{ motor.diameter }}mm</label>
-            <div class="btn-group" uib-dropdown>
-              <button id="motorBtn" type="button" class="btn btn-primary" uib-dropdown-toggle ng-disabled="disabled">
-                {{ motor.motor.name }}
-                <span class="caret"></span>
+            <label>Diameter: {{ motor_spec.diameter }}mm</label>
+            <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>
+            <div class="btn-group">
+              <button ng-click="openMotorChooser($parent.$index, $index, motor_spec.diameter)" class="btn btn-primary">
+                Pick Motor
               </button>
-              <ul class="dropdown-menu" uib-dropdown-menu  aria-labelledby="motorBtn">
-                <li ng-repeat="motor in allMotors" role="menuitem">
-                  <a ng-click="addMotorToStage($parent.$parent.$index, $parent.$index, motor)">{{ motor.name }}</a>
-                </li>
-              </ul>
             </div>
           </li>
         </ul>

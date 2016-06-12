@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-05-01
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-05-14
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2016 Joe Bowen;
  * Licensed MIT
@@ -137,7 +137,6 @@ angular.module('app').controller('HeaderCtrl', ['$scope', '$location', '$route',
     return httpRequestTracker.hasPendingRequests();
   };
 }]);
-
 angular.module('flights', ['resources.flights'])
 
 .config(['$routeProvider', function($routeProvider){
@@ -155,7 +154,32 @@ angular.module('flights', ['resources.flights'])
 .controller('FlightsListCtrl', ['$scope', 'flights', function($scope, flights){
   $scope.flights = flights;
 }]);
-angular.module('newFlight', ['resources.flights'])
+angular.module('newFlight.motor_chooser_form', [])
+
+.controller('MotorChooserFormController', ['$scope', 'Motors', '$uibModalInstance', 'stageIndex', 'motorIndex', 'motorDia', function($scope, Motors, $uibModalInstance, stageIndex, motorIndex, motorDia) {
+  $scope.stageIndex = stageIndex;
+  $scope.motorIndex = motorIndex;
+  $scope.motorDia = motorDia;
+
+  Motors.getMotorsByDiameter($scope.motorDia)
+    .then(function(response){
+      $scope.allMotors = response.data[Number($scope.motorDia).toFixed(1).toString()];
+    });
+
+  $scope.choose = function(){
+    $uibModalInstance.close({
+      "stage-index": $scope.stageIndex,
+      "motor-index": $scope.motorIndex,
+      "motor": JSON.parse($scope.data.multipleSelect)
+    })
+  }
+
+
+}]);
+
+
+
+angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight.motor_chooser_form'])
 
 .config(['$routeProvider', function($routeProvider){
   $routeProvider.when('/flights/new-flight', {
@@ -164,36 +188,56 @@ angular.module('newFlight', ['resources.flights'])
   });
 }])
 
-.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', function($scope, Flights, Rockets){
-  $scope.allMotors = [
-    {
-      name: "test_motor",
-      id : "1"
-    }
-  ];
-
+.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', '$uibModal', function($scope, Flights, Rockets, $uibModal){
   $scope.flight = {};
 
   Rockets.getAll()
     .then(function(response){
       $scope.rockets = response.data;
       $scope.rocket = $scope.rockets[0];
-      $scope.motor = $scope.rockets[0].rocket_data.motors;
+      $scope.motor_spec = $scope.rocket.rocket_data.motors;
     });
 
   $scope.submit = function() {
     $scope.flight.create = Date.now();
-    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor)
+    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor);
   };
 
   $scope.rocketItemSelected = function(rocket) {
     $scope.rocket = rocket;
-    $scope.motor = rocket.rocket_data.motors;
+    $scope.motor_spec = rocket.rocket_data.motors;
   };
 
-  $scope.addMotorToStage = function(stageIndex, motorIndex, motor) {
-    $scope.motor[stageIndex][motorIndex]['motor'] = motor;
+  var motorChooserDialog = null;
+  $scope.openMotorChooser = function(stageIndex, motorIndex, motorDia) {
+    if ( motorChooserDialog ) {
+      throw new Error('Trying to open a dialog that is already open!');
+    }
+    motorChooserDialog = $uibModal.open({
+      templateUrl: 'newFlight/motor_chooser_form.tpl.html',
+      controller: 'MotorChooserFormController',
+      resolve: {
+        stageIndex: function () { return stageIndex },
+        motorIndex: function () { return motorIndex },
+        motorDia:function () {  return motorDia }
+      }
+    });
+
+    motorChooserDialog.result.then(onMotorChooserDialogClose);
   };
+
+  function closeMotorChooserDialog(success) {
+    if (motorChooserDialog) {
+      motorChooserDialog.close(success);
+    }
+  };
+
+  function onMotorChooserDialogClose(success) {
+    motorChooserDialog = null;
+    $scope.motor_spec[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
+    debugger;
+  };
+
 }]);
 angular.module('rockets', ['resources.rockets'])
 
@@ -290,6 +334,41 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   return Flights;
+}]);
+angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '$location', function ($http, security, $location) {
+  var Motors = {};
+
+  Motors.getMotorsByDiameter = function(diameter){
+    return $http.get('https://logmyrocket.info/api/motors/diameter/' + diameter, {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken()
+        }
+      });
+  };
+
+  Motors.getAll = function(){
+    return $http.get('https://logmyrocket.info/api/motors', {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken()
+        }
+      });
+  };
+
+  Motors.getMotor = function(motor_id){
+    return $http.get('https://logmyrocket.info/api/motors/' + motor_id, {
+        withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken()
+        }
+      })
+      .then(function(response){
+        return response.data;
+      });
+  };
+
+  return Motors;
 }]);
 angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security', '$location', function ($http, security, $location) {
   var Rockets = {};
@@ -1079,7 +1158,7 @@ angular.module('services.notifications', []).factory('notifications', ['$rootSco
 
   return notificationsService;
 }]);
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -1280,19 +1359,14 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "        <label>Stage ({{ $index + 1 }}):  </label>\n" +
     "        <label>Number of motors: {{ stage.length }}</label>\n" +
     "        <ul>\n" +
-    "          <li ng-repeat=\"motor in stage track by $index\" role=\"menuitem\">\n" +
+    "          <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
     "            <label>Motor ({{ $index + 1 }}) </label>\n" +
-    "            <label>Diameter: {{ motor.diameter }}mm</label>\n" +
-    "            <div class=\"btn-group\" uib-dropdown>\n" +
-    "              <button id=\"motorBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
-    "                {{ motor.motor.name }}\n" +
-    "                <span class=\"caret\"></span>\n" +
+    "            <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
+    "            <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "            <div class=\"btn-group\">\n" +
+    "              <button ng-click=\"openMotorChooser($parent.$index, $index, motor_spec.diameter)\" class=\"btn btn-primary\">\n" +
+    "                Pick Motor\n" +
     "              </button>\n" +
-    "              <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorBtn\">\n" +
-    "                <li ng-repeat=\"motor in allMotors\" role=\"menuitem\">\n" +
-    "                  <a ng-click=\"addMotorToStage($parent.$parent.$index, $parent.$index, motor)\">{{ motor.name }}</a>\n" +
-    "                </li>\n" +
-    "              </ul>\n" +
     "            </div>\n" +
     "          </li>\n" +
     "        </ul>\n" +
@@ -1306,6 +1380,26 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "        Start Flight\n" +
     "      </button>\n" +
     "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
+angular.module("newFlight/motor_chooser_form.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("newFlight/motor_chooser_form.tpl.html",
+    "<form name=\"form\" novalidate class=\"login-form\">\n" +
+    "  <div class=\"modal-header\">\n" +
+    "    <h4>Choose a motor</h4>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-body\">\n" +
+    "    <label for=\"multipleSelect\"> Multiple select: </label><br>\n" +
+    "    <select name=\"multipleSelect\" id=\"multipleSelect\" ng-model=\"data.multipleSelect\" multiple>\n" +
+    "      <option ng-repeat=\"motor in allMotors\" value=\"{{ motor }}\">{{ motor['manufacturer-abbrev'] }} - {{ motor['common-name'] }}</option>\n" +
+    "    </select>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-footer\">\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"choose()\" ng-disabled='form.$invalid'>Ok</button>\n" +
+    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);
