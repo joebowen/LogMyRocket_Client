@@ -115,13 +115,13 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd' }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>Organization: </label> {{ user.organization }}\n" +
+    "    <label>Organization: </label> {{ user.settings.organization }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>NAR / TRA #: </label> {{ user.membership_num }}\n" +
+    "    <label>NAR / TRA #: </label> {{ user.settings.membership_num }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>Level: </label> {{ user.level }}\n" +
+    "    <label>Level: </label> {{ user.settings.level }}\n" +
     "  </div>\n" +
     "  <div>\n" +
     "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +

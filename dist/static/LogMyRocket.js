@@ -467,6 +467,21 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
 
   return Rockets;
 }]);
+angular.module('resources.users', []).factory('Users', ['$http', 'security', '$location', function ($http, security, $location) {
+  var Users = {};
+
+  Users.createUser = function(user){
+    return $http.post('https://logmyrocket.info/api/signup',
+      user,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  return Users;
+}]);
 angular.module('security.authorization', ['security.service'])
 
 // This service provides guard methods to support AngularJS routes.
@@ -542,11 +557,11 @@ angular.module('security.interceptor', ['security.retryQueue'])
 .config(['$httpProvider', function($httpProvider) {
   $httpProvider.interceptors.push('securityInterceptor');
 }]);
-angular.module('security.login.form', ['services.localizedMessages'])
+angular.module('security.login.form', ['services.localizedMessages', 'security.signup.form'])
 
 // The LoginFormController provides the behaviour behind a reusable form to allow users to authenticate.
 // This controller and its template (login/form.tpl.html) are used in a modal dialog box by the security service.
-.controller('LoginFormController', ['$scope', 'security', 'localizedMessages', function($scope, security, localizedMessages) {
+.controller('LoginFormController', ['$scope', 'security', 'localizedMessages', '$uibModal', function($scope, security, localizedMessages, $uibModal) {
   // The model for this form 
   $scope.user = {};
 
@@ -585,6 +600,54 @@ angular.module('security.login.form', ['services.localizedMessages'])
 
   $scope.cancelLogin = function() {
     security.cancelLogin();
+  };
+
+  // Signup form dialog stuff
+  var signupDialog = null;
+  function openSignupDialog() {
+    if ( signupDialog ) {
+      throw new Error('Trying to open a dialog that is already open!');
+    }
+    signupDialog = $uibModal.open({
+      templateUrl: 'security/login/signup.tpl.html',
+      controller: 'SignupFormController'
+    });
+
+    signupDialog.result.then(onSignupDialogClose);
+  }
+  function closeSignupDialog(success) {
+    if (signupDialog) {
+      signupDialog.close(success);
+    }
+  }
+  function onSignupDialogClose(success) {
+    signupDialog = null;
+  }
+
+  // Show the modal sign-up dialog
+  $scope.showSignup = function() {
+    openSignupDialog();
+  };
+}]);
+
+angular.module('security.signup.form', ['resources.users'])
+
+.controller('SignupFormController', ['$scope', 'Users', '$modalInstance', function($scope, Users, modalInstance) {
+  // The model for this form 
+  $scope.user = {};
+
+  $scope.signup = function() {
+    Users.createUser(this.user).then(function(response){
+      modalInstance.close();
+    });
+  };
+
+  $scope.clearForm = function() {
+    $scope.user = {};
+  };
+
+  $scope.cancelSignup = function() {
+    modalInstance.close();
   };
 }]);
 
@@ -1302,13 +1365,13 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd' }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>Organization: </label> {{ user.organization }}\n" +
+    "    <label>Organization: </label> {{ user.settings.organization }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>NAR / TRA #: </label> {{ user.membership_num }}\n" +
+    "    <label>NAR / TRA #: </label> {{ user.settings.membership_num }}\n" +
     "  </div>\n" +
     "  <div>\n" +
-    "    <label>Level: </label> {{ user.level }}\n" +
+    "    <label>Level: </label> {{ user.settings.level }}\n" +
     "  </div>\n" +
     "  <div>\n" +
     "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
@@ -1512,7 +1575,7 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
     "");
 }]);
 
-angular.module('templates.common', ['security/login/form.tpl.html', 'security/login/toolbar.tpl.html']);
+angular.module('templates.common', ['security/login/form.tpl.html', 'security/login/signup.tpl.html', 'security/login/toolbar.tpl.html']);
 
 angular.module("security/login/form.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("security/login/form.tpl.html",
@@ -1537,6 +1600,36 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
     "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
+    "    <div>\n" +
+    "      <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
+angular.module("security/login/signup.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("security/login/signup.tpl.html",
+    "<form name=\"form\" novalidate class=\"login-form\">\n" +
+    "  <div class=\"modal-header\">\n" +
+    "    <h4>Signup</h4>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-body\">\n" +
+    "    <div class=\"alert alert-info\">Please enter your login details</div>\n" +
+    "    <label>Username</label>\n" +
+    "    <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
+    "    <label>Password</label>\n" +
+    "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
+    "    <label>Organization</label>\n" +
+    "    <input name=\"organization\" type=\"text\" ng-model=\"user.settings.organization\" required>\n" +
+    "    <label>Membership Number</label>\n" +
+    "    <input name=\"membership_num\" type=\"text\" ng-model=\"user.settings.membership_num\" required>\n" +
+    "    <label>Level</label>\n" +
+    "    <input name=\"level\" type=\"text\" ng-model=\"user.settings.level\" required>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-footer\">\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"signup()\" ng-disabled='form.$invalid'>Signup!</button>\n" +
+    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelSignup()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);

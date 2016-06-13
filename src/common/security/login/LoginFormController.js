@@ -1,8 +1,8 @@
-angular.module('security.login.form', ['services.localizedMessages'])
+angular.module('security.login.form', ['services.localizedMessages', 'security.signup.form'])
 
 // The LoginFormController provides the behaviour behind a reusable form to allow users to authenticate.
 // This controller and its template (login/form.tpl.html) are used in a modal dialog box by the security service.
-.controller('LoginFormController', ['$scope', 'security', 'localizedMessages', function($scope, security, localizedMessages) {
+.controller('LoginFormController', ['$scope', 'security', 'localizedMessages', '$uibModal', function($scope, security, localizedMessages, $uibModal) {
   // The model for this form 
   $scope.user = {};
 
@@ -41,5 +41,32 @@ angular.module('security.login.form', ['services.localizedMessages'])
 
   $scope.cancelLogin = function() {
     security.cancelLogin();
+  };
+
+  // Signup form dialog stuff
+  var signupDialog = null;
+  function openSignupDialog() {
+    if ( signupDialog ) {
+      throw new Error('Trying to open a dialog that is already open!');
+    }
+    signupDialog = $uibModal.open({
+      templateUrl: 'security/login/signup.tpl.html',
+      controller: 'SignupFormController'
+    });
+
+    signupDialog.result.then(onSignupDialogClose);
+  }
+  function closeSignupDialog(success) {
+    if (signupDialog) {
+      signupDialog.close(success);
+    }
+  }
+  function onSignupDialogClose(success) {
+    signupDialog = null;
+  }
+
+  // Show the modal sign-up dialog
+  $scope.showSignup = function() {
+    openSignupDialog();
   };
 }]);

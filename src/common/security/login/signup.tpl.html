@@ -1,0 +1,23 @@
+<form name="form" novalidate class="login-form">
+  <div class="modal-header">
+    <h4>Signup</h4>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-info">Please enter your login details</div>
+    <label>Username</label>
+    <input name="login" type="text" ng-model="user.username" required autofocus>
+    <label>Password</label>
+    <input name="pass" type="password" ng-model="user.password" required>
+    <label>Organization</label>
+    <input name="organization" type="text" ng-model="user.settings.organization" required>
+    <label>Membership Number</label>
+    <input name="membership_num" type="text" ng-model="user.settings.membership_num" required>
+    <label>Level</label>
+    <input name="level" type="text" ng-model="user.settings.level" required>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary login" ng-click="signup()" ng-disabled='form.$invalid'>Signup!</button>
+    <button class="btn clear" ng-click="clearForm()">Clear</button>
+    <button class="btn btn-warning cancel" ng-click="cancelSignup()">Cancel</button>
+  </div>
+</form>
