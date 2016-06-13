@@ -1,13 +1,18 @@
 angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight.motor_chooser_form'])
 
 .config(['$routeProvider', function($routeProvider){
-  $routeProvider.when('/flights/new-flight', {
+  $routeProvider
+  .when('/flights/new-flight/', {
+    templateUrl:'newFlight/list.tpl.html',
+    controller:'NewFlightCtrl'
+  })
+  .when('/flights/new-flight/:rocket_id?', {
     templateUrl:'newFlight/list.tpl.html',
     controller:'NewFlightCtrl'
   });
 }])
 
-.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', '$uibModal', function($scope, Flights, Rockets, $uibModal){
+.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', '$uibModal', '$routeParams', '$location', function($scope, Flights, Rockets, $uibModal, $routeParams, $location){
   $scope.flight = {};
 
   Rockets.getAll()
@@ -19,7 +24,10 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
 
   $scope.submit = function() {
     $scope.flight.create = Date.now();
-    Flights.newFlight($scope.rocket, $scope.flight, $scope.motor);
+    Flights.newFlight($scope.rocket, $scope.flight).then(function(data) {
+      flight_id = data.flight_id;
+      $location.path('/flights/flightCard/' + flight_id);
+    });
   };
 
   $scope.rocketItemSelected = function(rocket) {

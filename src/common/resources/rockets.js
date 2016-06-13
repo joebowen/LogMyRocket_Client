@@ -7,7 +7,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
         }
-      });
+      })
   };
 
   Rockets.addRocket = function(rocket){

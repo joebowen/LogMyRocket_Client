@@ -3,6 +3,7 @@ angular.module('app', [
   'ngAnimate',
   'newFlight',
   'addRocket',
+  'flightCard',
   'flights',
   'rockets',
   'services.breadcrumbs',

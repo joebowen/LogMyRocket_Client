@@ -1,4 +1,4 @@
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -106,6 +106,64 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "</form>");
 }]);
 
+angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("flightCard/list.tpl.html",
+    "<h3>Flight Card</h3>\n" +
+    "\n" +
+    "<div>\n" +
+    "  <div>\n" +
+    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd' }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Organization: </label> {{ user.organization }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>NAR / TRA #: </label> {{ user.membership_num }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Level: </label> {{ user.level }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label class=\"col-sm-2 control-label\">Motor Configuration: </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"stage in flight.rocket_data.rocket_data.motors track by $index\">\n" +
+    "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
+    "          <label>Number of motors: {{ stage.length }}</label>\n" +
+    "          <ul>\n" +
+    "            <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
+    "              <label>Motor ({{ $index + 1 }}) </label>\n" +
+    "              <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
+    "              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}\n" +
+    "  </div>\n" +
+    "  <div>\n" +
+    "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "      Go to Pre-Flight Checklist\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
+}]);
+
 angular.module("flights/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("flights/list.tpl.html",
     "<h3>My Flights</h3>\n" +
@@ -113,7 +171,7 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "<ul class=\"list-group\">\n" +
     "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
     "    {{ flight.flight_id }}\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/edit-flight?flight_id={{ flight.flight_id }}\">Edit Flight</a>\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/edit-flight/{{ flight.flight_id }}/\">Edit Flight</a>\n" +
     "  </li>\n" +
     "</ul>");
 }]);
@@ -217,7 +275,7 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-offset-2 col-sm-10\">\n" +
     "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
-    "        Start Flight\n" +
+    "        Go To Flight Card\n" +
     "      </button>\n" +
     "    </div>\n" +
     "  </div>\n" +
@@ -260,8 +318,8 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
     "<ul class=\"list-group\">\n" +
     "  <li class=\"list-group-item\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
     "    {{ rocket.rocket_data.name }}\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/new-flight?rocket_id={{ rocket.rocket_id }}\">New Flight</a>\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/edit-rocket?rocket_id={{ rocket.rocket_id }}\">Edit Rocket</a>\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/new-flight/{{ rocket.rocket_id }}/\">New Flight</a>\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/edit-rocket/{{ rocket.rocket_id }}/\">Edit Rocket</a>\n" +
     "  </li>\n" +
     "</ul>\n" +
     "");

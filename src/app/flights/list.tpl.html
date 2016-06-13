@@ -3,6 +3,6 @@
 <ul class="list-group">
   <li class="list-group-item" ng-repeat="flight in flights track by flight.flight_id">
     {{ flight.flight_id }}
-    <a class="btn btn-default" href="/flights/edit-flight?flight_id={{ flight.flight_id }}">Edit Flight</a>
+    <a class="btn btn-default" href="/flights/edit-flight/{{ flight.flight_id }}/">Edit Flight</a>
   </li>
 </ul>

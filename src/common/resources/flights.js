@@ -13,11 +13,10 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.newFlight = function(rocket, flight, motor){
+  Flights.newFlight = function(rocket, flight){
     return $http.post('https://logmyrocket.info/api/flights',{
         'rocket_data': rocket,
-        'flight_data': flight,
-        'motor_data': motor
+        'flight_data': flight
       },
       {
         withCredentials: true,
@@ -27,7 +26,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
         }
       })
       .then(function(response){
-        $location.path('/flights');
+        return response.data;
       });
   };
 
