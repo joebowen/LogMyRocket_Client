@@ -110,38 +110,36 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
   $templateCache.put("flightCard/list.tpl.html",
     "<h3>Flight Card</h3>\n" +
     "\n" +
-    "<div>\n" +
-    "  <div>\n" +
-    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd' }}\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Organization: </label> {{ user.settings.organization }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>NAR / TRA #: </label> {{ user.settings.membership_num }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Level: </label> {{ user.settings.level }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label class=\"col-sm-2 control-label\">Motor Configuration: </label>\n" +
     "    <div class=\"col-sm-10\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"stage in flight.rocket_data.rocket_data.motors track by $index\">\n" +
-    "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
-    "          <label>Number of motors: {{ stage.length }}</label>\n" +
+    "          <label>Stage {{ $index + 1 }}:</label>\n" +
     "          <ul>\n" +
     "            <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
-    "              <label>Motor ({{ $index + 1 }}) </label>\n" +
     "              <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
     "              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
     "            </li>\n" +
@@ -150,10 +148,10 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}\n" +
     "  </div>\n" +
-    "  <div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
     "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
@@ -170,8 +168,13 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "\n" +
     "<ul class=\"list-group\">\n" +
     "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
-    "    {{ flight.flight_id }}\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/edit-flight/{{ flight.flight_id }}/\">Edit Flight</a>\n" +
+    "    <div>\n" +
+    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      {{ flight.rocket_data.rocket_data.name }}\n" +
+    "    </div>\n" +
+    "    <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
     "  </li>\n" +
     "</ul>");
 }]);

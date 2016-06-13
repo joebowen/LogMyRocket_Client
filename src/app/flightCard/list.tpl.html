@@ -1,37 +1,35 @@
 <h3>Flight Card</h3>
 
-<div>
-  <div>
-    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd' }}
+<div class="col-sm-12">
+  <div class="col-sm-12">
+    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Organization: </label> {{ user.settings.organization }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>NAR / TRA #: </label> {{ user.settings.membership_num }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Level: </label> {{ user.settings.level }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label class="col-sm-2 control-label">Motor Configuration: </label>
     <div class="col-sm-10">
       <ul class="list-group" aria-labelledby="inputMotorConfig">
         <li class="list-group-item" ng-repeat="stage in flight.rocket_data.rocket_data.motors track by $index">
-          <label>Stage ({{ $index + 1 }}):  </label>
-          <label>Number of motors: {{ stage.length }}</label>
+          <label>Stage {{ $index + 1 }}:</label>
           <ul>
             <li ng-repeat="motor_spec in stage track by $index" role="menuitem">
-              <label>Motor ({{ $index + 1 }}) </label>
               <label>Diameter: {{ motor_spec.diameter }}mm</label>
               <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>
             </li>
@@ -40,10 +38,10 @@
       </ul>
     </div>
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}
   </div>
-  <div>
+  <div class="col-sm-12">
     <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}
   </div>
   <div class="col-sm-offset-2 col-sm-10">
