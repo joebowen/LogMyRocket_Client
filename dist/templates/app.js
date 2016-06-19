@@ -112,7 +112,7 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "\n" +
     "<div class=\"col-sm-12\">\n" +
     "  <div class=\"col-sm-12\">\n" +
-    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}\n" +
+    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-12\">\n" +
     "    <label>Organization: </label> {{ user.settings.organization }}\n" +
