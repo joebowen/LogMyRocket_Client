@@ -1,4 +1,4 @@
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -155,8 +155,8 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
-    "    <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
-    "      Go to Pre-Flight Checklist\n" +
+    "    <button ng-click=\"submit(flight)\" class=\"btn btn-default\">\n" +
+    "      Launch!\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>");
@@ -169,12 +169,10 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "<ul class=\"list-group\">\n" +
     "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
     "    <div>\n" +
-    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}\n" +
-    "    </div>\n" +
-    "    <div>\n" +
+    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "      {{ flight.rocket_data.rocket_data.name }}\n" +
+    "      <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
     "    </div>\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
     "  </li>\n" +
     "</ul>");
 }]);
@@ -211,10 +209,6 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "        <li ng-show=\"isAuthenticated()\">\n" +
     "          <form class=\"navbar-form\">\n" +
     "            <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "          </form>\n" +
-    "        </li>\n" +
-    "        <li ng-show=\"isAuthenticated()\">\n" +
-    "          <form class=\"navbar-form\">\n" +
     "            <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
     "          </form>\n" +
     "        </li>\n" +
@@ -278,7 +272,7 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-offset-2 col-sm-10\">\n" +
     "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
-    "        Go To Flight Card\n" +
+    "        Go To Pre-Flight Checklist\n" +
     "      </button>\n" +
     "    </div>\n" +
     "  </div>\n" +
@@ -312,6 +306,51 @@ angular.module("notifications.tpl.html", []).run(["$templateCache", function($te
     "    {{notification.message}}\n" +
     "</div>\n" +
     "");
+}]);
+
+angular.module("postFlightData/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("postFlightData/list.tpl.html",
+    "<h3>Post-Flight Data</h3>\n" +
+    "\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <div class=\"form-group\">\n" +
+    "      <label for=\"notes\">Notes:</label>\n" +
+    "      <textarea class=\"form-control\" rows=\"5\" id=\"notes\" ng-model=\"flight.flight_data.notes\"></textarea>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit(flight)\" class=\"btn btn-default\">\n" +
+    "      Submit Flight Data\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
+}]);
+
+angular.module("preFlightChecklist/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("preFlightChecklist/list.tpl.html",
+    "<h3>Pre-Flight Checklist</h3>\n" +
+    "\n" +
+    "<uib-alert ng-repeat=\"alert in alerts\" type=\"{{alert.type}}\" close=\"closeAlert($index)\">{{alert.msg}}</uib-alert>\n" +
+    "\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"preFlightChecklist\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"item in flight.rocket_data.rocket_data.preflight track by $index\">\n" +
+    "          <ul>\n" +
+    "            <div class=\"checkbox\">\n" +
+    "              <label><input type=\"checkbox\" value=\"\" ng-model=\"checked[$index]\">{{ item }}</label>\n" +
+    "            </div>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit(flight, checked)\" class=\"btn btn-default\">\n" +
+    "      Go To Flight Card\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
 }]);
 
 angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($templateCache) {

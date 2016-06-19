@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-12
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-19
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2016 Joe Bowen;
  * Licensed MIT
@@ -61,6 +61,8 @@ angular.module('app', [
   'newFlight',
   'addRocket',
   'flightCard',
+  'preFlightChecklist',
+  'postFlightData',
   'flights',
   'rockets',
   'services.breadcrumbs',
@@ -141,7 +143,7 @@ angular.module('app').controller('HeaderCtrl', ['$scope', '$location', '$route',
 angular.module('flightCard', ['resources.flights'])
 
 .config(['$routeProvider', function($routeProvider){
-  $routeProvider.when('/flights/flightCard/:flight_id/', {
+  $routeProvider.when('/flights/flight-card/:flight_id/', {
     templateUrl:'flightCard/list.tpl.html',
     controller:'flightCardCtrl'
   });
@@ -154,8 +156,8 @@ angular.module('flightCard', ['resources.flights'])
 
   $scope.user = security.parseJwt(security.getToken());
 
-  $scope.submit = function() {
-    $location.path('/preflight/' + flight.flight_id);
+  $scope.submit = function(flight) {
+    $location.path('/flights/post-flight/' + flight.flight_id);
   };
 }]);
 angular.module('flights', ['resources.flights'])
@@ -228,7 +230,7 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
     $scope.flight.create = Date.now();
     Flights.newFlight($scope.rocket, $scope.flight).then(function(data) {
       flight_id = data.flight_id;
-      $location.path('/flights/flightCard/' + flight_id);
+      $location.path('/flights/pre-flight/' + flight_id);
     });
   };
 
@@ -266,6 +268,56 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
     $scope.motor_spec[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
   };
 
+}]);
+angular.module('postFlightData', ['resources.flights'])
+
+.config(['$routeProvider', function($routeProvider){
+  $routeProvider.when('/flights/post-flight/:flight_id/', {
+    templateUrl:'postFlightData/list.tpl.html',
+    controller:'postFlightDataCtrl'
+  });
+}])
+
+.controller('postFlightDataCtrl', ['$scope', 'Flights', '$location', '$routeParams', function($scope, Flights, $location, $routeParams){
+  Flights.getFlight($routeParams.flight_id).then(function(data) {
+    $scope.flight = data;
+  });
+
+  $scope.submit = function(flight) {
+    Flights.updateFlight(flight.flight_id, flight.flight_data).then(function() {
+      $location.path('flights/');
+    });
+  };
+}]);
+angular.module('preFlightChecklist', ['resources.flights'])
+
+.config(['$routeProvider', function($routeProvider){
+  $routeProvider.when('/flights/pre-flight/:flight_id/', {
+    templateUrl:'preFlightChecklist/list.tpl.html',
+    controller:'preFlightChecklistCtrl'
+  });
+}])
+
+.controller('preFlightChecklistCtrl', ['$scope', 'Flights', '$location', '$routeParams', function($scope, Flights, $location, $routeParams){
+  $scope.alerts = [];
+  $scope.checked = [];
+
+  Flights.getFlight($routeParams.flight_id).then(function(data) {
+    $scope.flight = data;
+  });
+
+  $scope.closeAlert = function(index) {
+    $scope.alerts = [];
+  };
+
+  $scope.submit = function(flight, checked) {
+    if (checked.length === flight.rocket_data.rocket_data.preflight.length) {
+      $location.path('flights/flight-card/' + flight.flight_id);
+    }
+    else {
+      $scope.alerts = [{ type: 'danger', msg: 'Please complete the checklist.' }];
+    }
+  };
 }]);
 angular.module('rockets', ['resources.rockets'])
 
@@ -330,11 +382,9 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.updateFlight = function(flight_id, rocket_id, flight, motor){
+  Flights.updateFlight = function(flight_id, flight_data){
     return $http.put('https://logmyrocket.info/api/flights/' + flight_id,{
-        'rocket_id': rocket_id,
-        'flight_data': flight,
-        'motor_data': motor
+        'flight_data': flight_data,
       },
       {
         withCredentials: true,
@@ -1248,7 +1298,7 @@ angular.module('services.notifications', []).factory('notifications', ['$rootSco
 
   return notificationsService;
 }]);
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -1405,8 +1455,8 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
-    "    <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
-    "      Go to Pre-Flight Checklist\n" +
+    "    <button ng-click=\"submit(flight)\" class=\"btn btn-default\">\n" +
+    "      Launch!\n" +
     "    </button>\n" +
     "  </div>\n" +
     "</div>");
@@ -1419,12 +1469,10 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "<ul class=\"list-group\">\n" +
     "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
     "    <div>\n" +
-    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}\n" +
-    "    </div>\n" +
-    "    <div>\n" +
+    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "      {{ flight.rocket_data.rocket_data.name }}\n" +
+    "      <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
     "    </div>\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
     "  </li>\n" +
     "</ul>");
 }]);
@@ -1461,10 +1509,6 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "        <li ng-show=\"isAuthenticated()\">\n" +
     "          <form class=\"navbar-form\">\n" +
     "            <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "          </form>\n" +
-    "        </li>\n" +
-    "        <li ng-show=\"isAuthenticated()\">\n" +
-    "          <form class=\"navbar-form\">\n" +
     "            <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
     "          </form>\n" +
     "        </li>\n" +
@@ -1528,7 +1572,7 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-offset-2 col-sm-10\">\n" +
     "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
-    "        Go To Flight Card\n" +
+    "        Go To Pre-Flight Checklist\n" +
     "      </button>\n" +
     "    </div>\n" +
     "  </div>\n" +
@@ -1562,6 +1606,51 @@ angular.module("notifications.tpl.html", []).run(["$templateCache", function($te
     "    {{notification.message}}\n" +
     "</div>\n" +
     "");
+}]);
+
+angular.module("postFlightData/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("postFlightData/list.tpl.html",
+    "<h3>Post-Flight Data</h3>\n" +
+    "\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <div class=\"form-group\">\n" +
+    "      <label for=\"notes\">Notes:</label>\n" +
+    "      <textarea class=\"form-control\" rows=\"5\" id=\"notes\" ng-model=\"flight.flight_data.notes\"></textarea>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit(flight)\" class=\"btn btn-default\">\n" +
+    "      Submit Flight Data\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
+}]);
+
+angular.module("preFlightChecklist/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("preFlightChecklist/list.tpl.html",
+    "<h3>Pre-Flight Checklist</h3>\n" +
+    "\n" +
+    "<uib-alert ng-repeat=\"alert in alerts\" type=\"{{alert.type}}\" close=\"closeAlert($index)\">{{alert.msg}}</uib-alert>\n" +
+    "\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"preFlightChecklist\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"item in flight.rocket_data.rocket_data.preflight track by $index\">\n" +
+    "          <ul>\n" +
+    "            <div class=\"checkbox\">\n" +
+    "              <label><input type=\"checkbox\" value=\"\" ng-model=\"checked[$index]\">{{ item }}</label>\n" +
+    "            </div>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit(flight, checked)\" class=\"btn btn-default\">\n" +
+    "      Go To Flight Card\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
 }]);
 
 angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($templateCache) {
@@ -1603,9 +1692,7 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
     "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
-    "    <div>\n" +
-    "      <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
-    "    </div>\n" +
+    "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);

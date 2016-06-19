@@ -1,0 +1,22 @@
+<h3>Pre-Flight Checklist</h3>
+
+<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+
+<div class="col-sm-12">
+  <div class="col-sm-12">
+      <ul class="list-group" aria-labelledby="preFlightChecklist">
+        <li class="list-group-item" ng-repeat="item in flight.rocket_data.rocket_data.preflight track by $index">
+          <ul>
+            <div class="checkbox">
+              <label><input type="checkbox" value="" ng-model="checked[$index]">{{ item }}</label>
+            </div>
+          </ul>
+        </li>
+      </ul>
+  </div>
+  <div class="col-sm-offset-2 col-sm-10">
+    <button ng-click="submit(flight, checked)" class="btn btn-default">
+      Go To Flight Card
+    </button>
+  </div>
+</div>

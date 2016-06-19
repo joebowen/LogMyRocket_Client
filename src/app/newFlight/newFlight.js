@@ -26,7 +26,7 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
     $scope.flight.create = Date.now();
     Flights.newFlight($scope.rocket, $scope.flight).then(function(data) {
       flight_id = data.flight_id;
-      $location.path('/flights/flightCard/' + flight_id);
+      $location.path('/flights/pre-flight/' + flight_id);
     });
   };
 

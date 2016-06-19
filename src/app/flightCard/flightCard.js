@@ -1,7 +1,7 @@
 angular.module('flightCard', ['resources.flights'])
 
 .config(['$routeProvider', function($routeProvider){
-  $routeProvider.when('/flights/flightCard/:flight_id/', {
+  $routeProvider.when('/flights/flight-card/:flight_id/', {
     templateUrl:'flightCard/list.tpl.html',
     controller:'flightCardCtrl'
   });
@@ -14,7 +14,7 @@ angular.module('flightCard', ['resources.flights'])
 
   $scope.user = security.parseJwt(security.getToken());
 
-  $scope.submit = function() {
-    $location.path('/preflight/' + flight.flight_id);
+  $scope.submit = function(flight) {
+    $location.path('/flights/post-flight/' + flight.flight_id);
   };
 }]);

@@ -3,11 +3,9 @@
 <ul class="list-group">
   <li class="list-group-item" ng-repeat="flight in flights track by flight.flight_id">
     <div>
-      {{ flight.flight_data.create  | date:'yyyy-MM-dd HH:mm' }}
-    </div>
-    <div>
+      {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}
       {{ flight.rocket_data.rocket_data.name }}
+      <a class="btn btn-default" href="/flights/post-flight/{{ flight.flight_id }}/">Add Post Flight Data</a>
     </div>
-    <a class="btn btn-default" href="/flights/post-flight/{{ flight.flight_id }}/">Add Post Flight Data</a>
   </li>
 </ul>

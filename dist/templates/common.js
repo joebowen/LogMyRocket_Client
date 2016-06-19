@@ -23,9 +23,7 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
     "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
-    "    <div>\n" +
-    "      <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
-    "    </div>\n" +
+    "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);

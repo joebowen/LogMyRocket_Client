@@ -42,11 +42,9 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
       });
   };
 
-  Flights.updateFlight = function(flight_id, rocket_id, flight, motor){
+  Flights.updateFlight = function(flight_id, flight_data){
     return $http.put('https://logmyrocket.info/api/flights/' + flight_id,{
-        'rocket_id': rocket_id,
-        'flight_data': flight,
-        'motor_data': motor
+        'flight_data': flight_data,
       },
       {
         withCredentials: true,

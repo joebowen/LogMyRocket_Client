@@ -4,6 +4,8 @@ angular.module('app', [
   'newFlight',
   'addRocket',
   'flightCard',
+  'preFlightChecklist',
+  'postFlightData',
   'flights',
   'rockets',
   'services.breadcrumbs',
