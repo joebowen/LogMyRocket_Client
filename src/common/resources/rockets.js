@@ -30,7 +30,8 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
     return $http.get('https://logmyrocket.info/api/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
-          'Authorization': 'Bearer ' + security.getToken()
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
         }
       })
       .then(function(response){

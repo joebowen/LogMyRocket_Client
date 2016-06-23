@@ -7,12 +7,14 @@ angular.module('flightCard', ['resources.flights'])
   });
 }])
 
-.controller('flightCardCtrl', ['$scope', 'Flights', 'security', '$location', '$routeParams', function($scope, Flights, security, $location, $routeParams){
-  Flights.getFlight($routeParams.flight_id).then(function(data) {
-    $scope.flight = data;
+.controller('flightCardCtrl', ['$scope', 'Flights', '$location', '$routeParams', 'Users', function($scope, Flights, $location, $routeParams, Users){
+  Flights.getFlight($routeParams.flight_id).then(function(flight) {
+    $scope.flight = flight;
   });
 
-  $scope.user = security.parseJwt(security.getToken());
+  Users.getSettings().then(function(user) {
+    $scope.user = user.data;
+  });
 
   $scope.submit = function(flight) {
     $location.path('/flights/post-flight/' + flight.flight_id);

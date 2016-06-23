@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-19
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-22
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2016 Joe Bowen;
  * Licensed MIT
@@ -52,6 +52,9 @@ angular.module('addRocket', ['resources.rockets'])
   };
 
   $scope.addMotorSizeToStage = function(stageIndex, motorIndex, diameter) {
+    if($scope.rocket.motors[stageIndex][motorIndex] === undefined) {
+      $scope.rocket.motors[stageIndex][motorIndex] = {};
+    }
     $scope.rocket.motors[stageIndex][motorIndex]['diameter'] = diameter;
   };
 }]);
@@ -60,11 +63,14 @@ angular.module('app', [
   'ngAnimate',
   'newFlight',
   'addRocket',
+  'editRocket',
   'flightCard',
   'preFlightChecklist',
   'postFlightData',
+  'viewFlight',
   'flights',
   'rockets',
+  'settings',
   'services.breadcrumbs',
   'services.i18nNotifications',
   'services.httpRequestTracker',
@@ -140,6 +146,57 @@ angular.module('app').controller('HeaderCtrl', ['$scope', '$location', '$route',
     return httpRequestTracker.hasPendingRequests();
   };
 }]);
+angular.module('editRocket', ['resources.rockets'])
+
+.config(['$routeProvider', function($routeProvider){
+  $routeProvider.when('/rockets/edit-rocket/:rocket_id/', {
+    templateUrl:'editRocket/list.tpl.html',
+    controller:'EditRocketCtrl'
+  });
+}])
+
+.controller('EditRocketCtrl', ['$scope', 'Rockets', '$routeParams', '$location', function($scope, Rockets, $routeParams, $location){
+  $scope.recoveries = ['Parachute', 'Streamer', 'Tumble', 'Helicopter', 'Dual-Parachute'];
+  $scope.rods = ['1/8"', '3/16"', '1/4"', 'T1010 (rail)'];
+  $scope.motorSizes = ['13', '18', '24', '29', '38', '54'];
+  $scope.clusterSizes = _.range(1,35);
+
+  Rockets.getRocket($routeParams.rocket_id).then(function(rocket) {
+    $scope.rocket = rocket.rocket_data;
+  });
+
+  $scope.recoveryItemSelected = function (item) {
+    $scope.rocket.recovery = item;
+  };
+
+  $scope.rodItemSelected = function (item) {
+    $scope.rocket.rod = item;
+  };
+
+  $scope.submit = function() {
+    Rockets.updateRocket($routeParams.rocket_id, $scope.rocket);
+    $location.path('/');
+  };
+
+  $scope.addPreFlightRow = function() {
+    $scope.rocket.preflight.push("");
+  };
+
+  $scope.addStage = function() {
+    $scope.rocket.motors.push({'diameter': $scope.motorSizes[0]});
+  };
+
+  $scope.clusterSizeSelected = function(stageIndex, size) {
+    $scope.rocket.motors[stageIndex] = new Array(size);
+  };
+
+  $scope.addMotorSizeToStage = function(stageIndex, motorIndex, diameter) {
+    if($scope.rocket.motors[stageIndex][motorIndex] === undefined) {
+      $scope.rocket.motors[stageIndex][motorIndex] = {};
+    }
+    $scope.rocket.motors[stageIndex][motorIndex]['diameter'] = diameter;
+  };
+}]);
 angular.module('flightCard', ['resources.flights'])
 
 .config(['$routeProvider', function($routeProvider){
@@ -149,12 +206,14 @@ angular.module('flightCard', ['resources.flights'])
   });
 }])
 
-.controller('flightCardCtrl', ['$scope', 'Flights', 'security', '$location', '$routeParams', function($scope, Flights, security, $location, $routeParams){
-  Flights.getFlight($routeParams.flight_id).then(function(data) {
-    $scope.flight = data;
+.controller('flightCardCtrl', ['$scope', 'Flights', '$location', '$routeParams', 'Users', function($scope, Flights, $location, $routeParams, Users){
+  Flights.getFlight($routeParams.flight_id).then(function(flight) {
+    $scope.flight = flight;
   });
 
-  $scope.user = security.parseJwt(security.getToken());
+  Users.getSettings().then(function(user) {
+    $scope.user = user.data;
+  });
 
   $scope.submit = function(flight) {
     $location.path('/flights/post-flight/' + flight.flight_id);
@@ -338,6 +397,43 @@ angular.module('rockets', ['resources.rockets'])
 .controller('RocketsListCtrl', ['$scope', 'rockets', function($scope, rockets){
   $scope.rockets = rockets;
 }]);
+angular.module('settings', ['resources.rockets'])
+
+.config(['$routeProvider', function($routeProvider){
+  $routeProvider.when('/settings', {
+    templateUrl:'settings/list.tpl.html',
+    controller:'SettingsCtrl'
+  });
+}])
+
+.controller('SettingsCtrl', ['$scope', 'Users', '$location', function($scope, Users, $location){
+  Users.getSettings().then(function(user) {
+    $scope.user = user.data;
+  });
+
+  $scope.submit = function() {
+    Users.updateSettings($scope.user);
+    $location.path('/');
+  };
+}]);
+angular.module('viewFlight', ['resources.flights'])
+
+.config(['$routeProvider', function($routeProvider){
+  $routeProvider.when('/flights/view-flight/:flight_id/', {
+    templateUrl:'viewFlight/list.tpl.html',
+    controller:'viewFlightCtrl'
+  });
+}])
+
+.controller('viewFlightCtrl', ['$scope', 'Flights', '$location', '$routeParams', function($scope, Flights, $location, $routeParams){
+  Flights.getFlight($routeParams.flight_id).then(function(flight) {
+    $scope.flight = flight;
+  });
+
+  $scope.submit = function() {
+    $location.path('/flights');
+  };
+}]);
 angular.module('resources.flights', []).factory('Flights', ['$http', 'security', '$location', function ($http, security, $location) {
   var Flights = {};
 
@@ -479,7 +575,8 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
     return $http.get('https://logmyrocket.info/api/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
-          'Authorization': 'Bearer ' + security.getToken()
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
         }
       })
       .then(function(response){
@@ -525,6 +622,29 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
       user,
       {
         headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  Users.updateSettings = function(settings){
+    return $http.put('https://logmyrocket.info/api/settings',
+      {
+        'settings': settings,
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  Users.getSettings = function(){
+    return $http.get('https://logmyrocket.info/api/settings',
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
           'Content-Type': 'application/json'
         }
       });
@@ -706,7 +826,7 @@ angular.module('security.login.toolbar', [])
 
 // The loginToolbar directive is a reusable widget that can show login or logout buttons
 // and information the current authenticated user
-.directive('loginToolbar', ['security', function(security) {
+.directive('loginToolbar', ['security', '$location', function(security, $location) {
   var directive = {
     templateUrl: 'security/login/toolbar.tpl.html',
     restrict: 'E',
@@ -721,6 +841,9 @@ angular.module('security.login.toolbar', [])
       }, function(currentUser) {
         $scope.currentUser = currentUser;
       });
+      $scope.settings = function() {
+        $location.path('/settings');
+      }
     }
   };
   return directive;
@@ -1298,7 +1421,7 @@ angular.module('services.notifications', []).factory('notifications', ['$rootSco
 
   return notificationsService;
 }]);
-angular.module('templates.app', ['addRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'editRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html', 'settings/list.tpl.html', 'viewFlight/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -1309,6 +1432,16 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "    <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
     "    <div class=\"col-sm-10\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketName\" ng-model=\"rocket.name\" />\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRocketMfg\" class=\"col-sm-2 control-label\">Rocket Manufacturer:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketMfg\" ng-model=\"rocket.mfg\" />\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRocketColors\" class=\"col-sm-2 control-label\">Rocket Colors:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketColors\" ng-model=\"rocket.colors\" />\n" +
     "    </div>\n" +
     "\n" +
     "    <label for=\"inputRecoveryMode\" class=\"col-sm-2 control-label\">Recovery Mode:</label>\n" +
@@ -1356,12 +1489,12 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "              <label>Diameter: </label>\n" +
     "              <div class=\"btn-group\" uib-dropdown>\n" +
     "                <button id=\"motorSizeBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
-    "                  {{ motor }}\n" +
+    "                  {{ motor.diameter }}mm\n" +
     "                  <span class=\"caret\"></span>\n" +
     "                </button>\n" +
     "                <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorSizeBtn\">\n" +
     "                  <li ng-repeat=\"motorSize in motorSizes\" role=\"menuitem\">\n" +
-    "                    <a ng-click=\"addMotorSizeToStage($parent.$parent.$index, $parent.$index, motorSize)\">{{ motorSize }}</a>\n" +
+    "                    <a ng-click=\"addMotorSizeToStage($parent.$parent.$index, $parent.$index, motorSize)\">{{ motorSize }}mm</a>\n" +
     "                  </li>\n" +
     "                </ul>\n" +
     "              </div>\n" +
@@ -1406,6 +1539,122 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "</form>");
 }]);
 
+angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("editRocket/list.tpl.html",
+    "<h3>Edit Rocket</h3>\n" +
+    "\n" +
+    "<form class=\"form-horizontal\" role=\"form\">\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketName\" ng-model=\"rocket.name\" />\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRocketMfg\" class=\"col-sm-2 control-label\">Rocket Manufacturer:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketMfg\" ng-model=\"rocket.mfg\" />\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRocketColors\" class=\"col-sm-2 control-label\">Rocket Colors:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"inputRocketColors\" ng-model=\"rocket.colors\" />\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRecoveryMode\" class=\"col-sm-2 control-label\">Recovery Mode:</label>\n" +
+    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "      <button id=\"inputRecoveryMode\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "        {{ rocket.recovery }}\n" +
+    "        <span class=\"caret\"></span>\n" +
+    "      </button>\n" +
+    "      <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"inputRecoveryMode\">\n" +
+    "        <li ng-repeat=\"a in recoveries\" role=\"menuitem\"><a ng-click=\"recoveryItemSelected(a)\">{{a}}</a></li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputRodSize\" class=\"col-sm-2 control-label\">Rod/Rail Size:</label>\n" +
+    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "      <button id=\"inputRodSize\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "        {{ rocket.rod }}\n" +
+    "        <span class=\"caret\"></span>\n" +
+    "      </button>\n" +
+    "      <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"inputRodSize\">\n" +
+    "        <li ng-repeat=\"a in rods\" role=\"menuitem\"><a ng-click=\"rodItemSelected(a)\">{{a}}</a></li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputMotorConfig\" class=\"col-sm-2 control-label\">Motor Configuration:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"stage in rocket.motors track by $index\">\n" +
+    "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
+    "          <label>Number of motors: </label>\n" +
+    "          <div class=\"btn-group\" uib-dropdown>\n" +
+    "            <button id=\"clusterSizeBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "              {{ stage.length }}\n" +
+    "              <span class=\"caret\"></span>\n" +
+    "            </button>\n" +
+    "            <ul class=\"dropdown-menu\" uib-dropdown-menu role=\"menu\" aria-labelledby=\"clusterSizeBtn\">\n" +
+    "              <li ng-repeat=\"clusterSize in clusterSizes\" role=\"menuitem\">\n" +
+    "                <a ng-click=\"clusterSizeSelected($parent.$index, clusterSize)\">{{ clusterSize }}</a>\n" +
+    "              </li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "          <ul>\n" +
+    "            <li ng-repeat=\"motor in stage track by $index\" role=\"menuitem\">\n" +
+    "              <label>Motor ({{ $index + 1 }}) </label>\n" +
+    "              <label>Diameter: </label>\n" +
+    "              <div class=\"btn-group\" uib-dropdown>\n" +
+    "                <button id=\"motorSizeBtn\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
+    "                  {{ motor.diameter }}mm\n" +
+    "                  <span class=\"caret\"></span>\n" +
+    "                </button>\n" +
+    "                <ul class=\"dropdown-menu\" uib-dropdown-menu  aria-labelledby=\"motorSizeBtn\">\n" +
+    "                  <li ng-repeat=\"motorSize in motorSizes\" role=\"menuitem\">\n" +
+    "                    <a ng-click=\"addMotorSizeToStage($parent.$parent.$index, $parent.$index, motorSize)\">{{ motorSize }}mm</a>\n" +
+    "                  </li>\n" +
+    "                </ul>\n" +
+    "              </div>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "        <li class=\"list-group-item\">\n" +
+    "          <button id=\"inputMotorConfig\" type=\"button\" class=\"btn btn-primary\" ng-click=\"addStage()\">\n" +
+    "            Add Stage\n" +
+    "          </button>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-2 control-label\">Pre-Flight Checklist Items:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputPreFlightChecklist\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"a in rocket.preflight track by $index\">\n" +
+    "          <input type=\"text\" class=\"form-control\" ng-model=\"rocket.preflight[$index]\" />\n" +
+    "        </li>\n" +
+    "        <li class=\"list-group-item\">\n" +
+    "          <button id=\"inputPreFlightChecklist\" type=\"button\" class=\"btn btn-primary\" ng-click=\"addPreFlightRow()\">\n" +
+    "            Add Pre-Flight Checklist Item\n" +
+    "          </button>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "\n" +
+    "    <label for=\"inputNotes\" class=\"col-sm-2 control-label\">Notes:</label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <textarea class=\"form-control\" rows=\"5\" id=\"inputNotes\" ng-model=\"rocket.notes\"></textarea>\n" +
+    "    </div>\n" +
+    "\n" +
+    "  </div>\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <div class=\"col-sm-12\">\n" +
+    "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "        Update Rocket\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
 angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("flightCard/list.tpl.html",
     "<h3>Flight Card</h3>\n" +
@@ -1415,13 +1664,13 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-12\">\n" +
-    "    <label>Organization: </label> {{ user.settings.organization }}\n" +
+    "    <label>Organization: </label> {{ user.organization }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-12\">\n" +
-    "    <label>NAR / TRA #: </label> {{ user.settings.membership_num }}\n" +
+    "    <label>Membership Number: </label> {{ user.membership_num }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-12\">\n" +
-    "    <label>Level: </label> {{ user.settings.level }}\n" +
+    "    <label>Level: </label> {{ user.level }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-12\">\n" +
     "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
@@ -1471,7 +1720,8 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
     "    <div>\n" +
     "      {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "      {{ flight.rocket_data.rocket_data.name }}\n" +
-    "      <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Post Flight Data</a>\n" +
+    "      <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Data</a>\n" +
+    "      <a class=\"btn btn-default\" href=\"/flights/view-flight/{{ flight.flight_id }}/\">View</a>\n" +
     "    </div>\n" +
     "  </li>\n" +
     "</ul>");
@@ -1661,10 +1911,89 @@ angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($tem
     "  <li class=\"list-group-item\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
     "    {{ rocket.rocket_data.name }}\n" +
     "    <a class=\"btn btn-default\" href=\"/flights/new-flight/{{ rocket.rocket_id }}/\">New Flight</a>\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/edit-rocket/{{ rocket.rocket_id }}/\">Edit Rocket</a>\n" +
+    "    <a class=\"btn btn-default\" href=\"/rockets/edit-rocket/{{ rocket.rocket_id }}/\">Edit Rocket</a>\n" +
     "  </li>\n" +
     "</ul>\n" +
     "");
+}]);
+
+angular.module("settings/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("settings/list.tpl.html",
+    "<h3>User Settings</h3>\n" +
+    "\n" +
+    "<form class=\"form-horizontal\" role=\"form\">\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <label for=\"organization\" class=\"col-sm-2 control-label\">Organization (NAR/Tripoli): </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"organization\" ng-model=\"user.organization\" />\n" +
+    "    </div>\n" +
+    "    <label for=\"membershipNum\" class=\"col-sm-2 control-label\">Membership Number: </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"membershipNum\" ng-model=\"user.membership_num\" />\n" +
+    "    </div>\n" +
+    "    <label for=\"level\" class=\"col-sm-2 control-label\">Level: </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"level\" ng-model=\"user.level\" />\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <div class=\"col-sm-12\">\n" +
+    "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "        Update Settings\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
+angular.module("viewFlight/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("viewFlight/list.tpl.html",
+    "<h3>Flight</h3>\n" +
+    "\n" +
+    "<div class=\"col-sm-12\">\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label class=\"col-sm-2 control-label\">Motor Configuration: </label>\n" +
+    "    <div class=\"col-sm-10\">\n" +
+    "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
+    "        <li class=\"list-group-item\" ng-repeat=\"stage in flight.rocket_data.rocket_data.motors track by $index\">\n" +
+    "          <label>Stage {{ $index + 1 }}:</label>\n" +
+    "          <ul>\n" +
+    "            <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
+    "              <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
+    "              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "        </li>\n" +
+    "      </ul>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-12\">\n" +
+    "    <label>Notes: </label> {{ flight.flight_data.notes }}\n" +
+    "  </div>\n" +
+    "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
+    "    <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "      Return to Flights\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "</div>");
 }]);
 
 angular.module('templates.common', ['security/login/form.tpl.html', 'security/login/signup.tpl.html', 'security/login/toolbar.tpl.html']);
@@ -1689,7 +2018,7 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +
-    "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
     "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
     "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
@@ -1728,6 +2057,11 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
+    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
+    "      <form class=\"navbar-form\">\n" +
+    "          <button class=\"btn logout\" ng-click=\"settings()\">Settings</button>\n" +
+    "      </form>\n" +
+    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"logout()\">Log out</button>\n" +

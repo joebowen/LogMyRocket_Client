@@ -11,5 +11,28 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
       });
   };
 
+  Users.updateSettings = function(settings){
+    return $http.put('https://logmyrocket.info/api/settings',
+      {
+        'settings': settings,
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  Users.getSettings = function(){
+    return $http.get('https://logmyrocket.info/api/settings',
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
   return Users;
 }]);

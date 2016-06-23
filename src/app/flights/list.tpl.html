@@ -5,7 +5,8 @@
     <div>
       {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}
       {{ flight.rocket_data.rocket_data.name }}
-      <a class="btn btn-default" href="/flights/post-flight/{{ flight.flight_id }}/">Add Post Flight Data</a>
+      <a class="btn btn-default" href="/flights/post-flight/{{ flight.flight_id }}/">Add Data</a>
+      <a class="btn btn-default" href="/flights/view-flight/{{ flight.flight_id }}/">View</a>
     </div>
   </li>
 </ul>

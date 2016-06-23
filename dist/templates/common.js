@@ -20,7 +20,7 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +
-    "    <button class=\"btn btn-primary login\" ng-click=\"login()\" ng-disabled='form.$invalid'>Sign in</button>\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
     "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
     "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
@@ -59,6 +59,11 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
+    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
+    "      <form class=\"navbar-form\">\n" +
+    "          <button class=\"btn logout\" ng-click=\"settings()\">Settings</button>\n" +
+    "      </form>\n" +
+    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"logout()\">Log out</button>\n" +

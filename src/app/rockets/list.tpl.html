@@ -4,6 +4,6 @@
   <li class="list-group-item" ng-repeat="rocket in rockets track by rocket.rocket_id">
     {{ rocket.rocket_data.name }}
     <a class="btn btn-default" href="/flights/new-flight/{{ rocket.rocket_id }}/">New Flight</a>
-    <a class="btn btn-default" href="/flights/edit-rocket/{{ rocket.rocket_id }}/">Edit Rocket</a>
+    <a class="btn btn-default" href="/rockets/edit-rocket/{{ rocket.rocket_id }}/">Edit Rocket</a>
   </li>
 </ul>
