@@ -1,12 +1,12 @@
 angular.module('security.signup.form', ['resources.users'])
 
-.controller('SignupFormController', ['$scope', 'Users', '$modalInstance', function($scope, Users, modalInstance) {
+.controller('SignupFormController', ['$scope', 'Users', '$uibModalInstance', function($scope, Users, uibModalInstance) {
   // The model for this form 
   $scope.user = {};
 
   $scope.signup = function() {
     Users.createUser(this.user).then(function(response){
-      modalInstance.close();
+      uibModalInstance.close();
     });
   };
 
@@ -15,6 +15,6 @@ angular.module('security.signup.form', ['resources.users'])
   };
 
   $scope.cancelSignup = function() {
-    modalInstance.close();
+    uibModalInstance.close();
   };
 }]);

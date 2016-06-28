@@ -306,53 +306,57 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("header.tpl.html",
-    "<div class=\"navbar navbar-default\" ng-controller=\"HeaderCtrl\">\n" +
-    "  <div class=\"container-fluid\">\n" +
-    "    <div class=\"navbar-header\">\n" +
-    "      <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\" aria-expanded=\"false\">\n" +
-    "        <span class=\"sr-only\">Toggle navigation</span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "      </button>\n" +
-    "      <a class=\"navbar-brand\" href=\"#\">Log My Rocket</a>\n" +
-    "    </div>\n" +
+    "<div class=\"navbar-wrapper\">\n" +
+    "  <div class=\"container\">\n" +
+    "    <nav class=\"navbar navbar-default\" ng-controller=\"HeaderCtrl\">\n" +
+    "      <div class=\"container-fluid\">\n" +
+    "        <div class=\"navbar-header\">\n" +
+    "          <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n" +
+    "            <span class=\"sr-only\">Toggle navigation</span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "          </button>\n" +
+    "          <a class=\"navbar-brand\" href=\"#\">Log My Rocket</a>\n" +
+    "        </div>\n" +
     "\n" +
-    "    <!-- Collect the nav links, forms, and other content for toggling -->\n" +
-    "    <div class=\"collapse navbar-collapse\">\n" +
-    "      <ul class=\"nav navbar-nav\">\n" +
-    "        <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
-    "        <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
+    "        <!-- Collect the nav links, forms, and other content for toggling -->\n" +
+    "        <div id=\"navbar\" class=\"collapse navbar-collapse\">\n" +
+    "          <ul class=\"nav navbar-nav\">\n" +
+    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
+    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
     "\n" +
-    "        <li>\n" +
-    "          <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
-    "            <li class=\"divider-vertical\"></li>\n" +
-    "            <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
-    "          </ul>\n" +
-    "        </li>\n" +
-    "      </ul>\n" +
-    "\n" +
-    "      <ul class=\"nav navbar-nav navbar-left\">\n" +
-    "        <li ng-show=\"isAuthenticated()\">\n" +
-    "          <form class=\"navbar-form\">\n" +
-    "            <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "            <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
-    "          </form>\n" +
-    "        </li>\n" +
-    "      </ul>\n" +
-    "      <login-toolbar></login-toolbar>\n" +
-    "    </div>\n" +
-    "    <div>\n" +
-    "        <ul class=\"breadcrumb\">\n" +
-    "            <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
-    "                <span class=\"divider\">/</span>\n" +
-    "                <ng-switch on=\"$last\">\n" +
-    "                    <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
-    "                    <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
-    "                </ng-switch>\n" +
+    "            <li>\n" +
+    "              <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
+    "                <li class=\"divider-vertical\"></li>\n" +
+    "                <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
+    "              </ul>\n" +
     "            </li>\n" +
-    "        </ul>\n" +
-    "    </div>\n" +
+    "          </ul>\n" +
+    "\n" +
+    "          <ul class=\"nav navbar-nav navbar-left\">\n" +
+    "            <li ng-show=\"isAuthenticated()\">\n" +
+    "              <form class=\"navbar-form\">\n" +
+    "                <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
+    "                <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
+    "              </form>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "          <login-toolbar></login-toolbar>\n" +
+    "        </div>\n" +
+    "        <div>\n" +
+    "            <ul class=\"breadcrumb\">\n" +
+    "                <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
+    "                    <span class=\"divider\">/</span>\n" +
+    "                    <ng-switch on=\"$last\">\n" +
+    "                        <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
+    "                        <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
+    "                    </ng-switch>\n" +
+    "                </li>\n" +
+    "            </ul>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </nav>\n" +
     "  </div>\n" +
     "</div>");
 }]);

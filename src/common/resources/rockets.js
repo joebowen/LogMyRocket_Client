@@ -2,7 +2,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   var Rockets = {};
 
   Rockets.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/rockets', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -11,7 +11,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.addRocket = function(rocket){
-    return $http.post('https://logmyrocket.info/api/rockets',{
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets',{
         'rocket_data': rocket
       },
       {
@@ -27,7 +27,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.getRocket = function(rocket_id){
-    return $http.get('https://logmyrocket.info/api/rockets/' + rocket_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken(),
@@ -40,7 +40,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.updateRocket = function(rocket_id, rocket){
-    return $http.put('https://logmyrocket.info/api/rockets/' + rocket_id,{
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id,{
         'rocket_data': rocket
       },
       {
@@ -56,7 +56,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.deleteRocket = function(rocket_id){
-    return $http.delete('https://logmyrocket.info/api/rockets/' + rocket_id, {
+    return $http.delete('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()

@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-22
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-06-27
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2016 Joe Bowen;
  * Licensed MIT
@@ -438,7 +438,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   var Flights = {};
 
   Flights.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/flights', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -450,7 +450,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.newFlight = function(rocket, flight){
-    return $http.post('https://logmyrocket.info/api/flights',{
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights',{
         'rocket_data': rocket,
         'flight_data': flight
       },
@@ -467,7 +467,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.getFlight = function(flight_id){
-    return $http.get('https://logmyrocket.info/api/flights/' + flight_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -479,7 +479,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.updateFlight = function(flight_id, flight_data){
-    return $http.put('https://logmyrocket.info/api/flights/' + flight_id,{
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id,{
         'flight_data': flight_data,
       },
       {
@@ -495,7 +495,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.deleteFlight = function(flight_id){
-    return $http.delete('https://logmyrocket.info/api/flights/' + flight_id, {
+    return $http.delete('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -512,7 +512,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   var Motors = {};
 
   Motors.getMotorsByDiameter = function(diameter){
-    return $http.get('https://logmyrocket.info/api/motors/diameter/' + diameter, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors/diameter/' + diameter, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -521,7 +521,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   };
 
   Motors.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/motors', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -530,7 +530,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   };
 
   Motors.getMotor = function(motor_id){
-    return $http.get('https://logmyrocket.info/api/motors/' + motor_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors/' + motor_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -547,7 +547,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   var Rockets = {};
 
   Rockets.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/rockets', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -556,7 +556,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.addRocket = function(rocket){
-    return $http.post('https://logmyrocket.info/api/rockets',{
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets',{
         'rocket_data': rocket
       },
       {
@@ -572,7 +572,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.getRocket = function(rocket_id){
-    return $http.get('https://logmyrocket.info/api/rockets/' + rocket_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken(),
@@ -585,7 +585,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.updateRocket = function(rocket_id, rocket){
-    return $http.put('https://logmyrocket.info/api/rockets/' + rocket_id,{
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id,{
         'rocket_data': rocket
       },
       {
@@ -601,7 +601,7 @@ angular.module('resources.rockets', []).factory('Rockets', ['$http', 'security',
   };
 
   Rockets.deleteRocket = function(rocket_id){
-    return $http.delete('https://logmyrocket.info/api/rockets/' + rocket_id, {
+    return $http.delete('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/rockets/' + rocket_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -618,7 +618,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   var Users = {};
 
   Users.createUser = function(user){
-    return $http.post('https://logmyrocket.info/api/signup',
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/signup',
       user,
       {
         headers: {
@@ -628,7 +628,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   };
 
   Users.updateSettings = function(settings){
-    return $http.put('https://logmyrocket.info/api/settings',
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/settings',
       {
         'settings': settings,
       },
@@ -641,7 +641,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   };
 
   Users.getSettings = function(){
-    return $http.get('https://logmyrocket.info/api/settings',
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/settings',
       {
         headers: {
           'Authorization': 'Bearer ' + security.getToken(),
@@ -802,13 +802,13 @@ angular.module('security.login.form', ['services.localizedMessages', 'security.s
 
 angular.module('security.signup.form', ['resources.users'])
 
-.controller('SignupFormController', ['$scope', 'Users', '$modalInstance', function($scope, Users, modalInstance) {
+.controller('SignupFormController', ['$scope', 'Users', '$uibModalInstance', function($scope, Users, uibModalInstance) {
   // The model for this form 
   $scope.user = {};
 
   $scope.signup = function() {
     Users.createUser(this.user).then(function(response){
-      modalInstance.close();
+      uibModalInstance.close();
     });
   };
 
@@ -817,7 +817,7 @@ angular.module('security.signup.form', ['resources.users'])
   };
 
   $scope.cancelSignup = function() {
-    modalInstance.close();
+    uibModalInstance.close();
   };
 }]);
 
@@ -982,7 +982,7 @@ angular.module('security.service', [
 
     // Attempt to authenticate a user by the given username and password
     login: function(username, password) {
-      var request = $http.post('https://logmyrocket.info/api/login?', {'username': username, 'password': password});
+      var request = $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/login', {'username': username, 'password': password});
       return request.then(function(response) {
         service.currentUser = response.data;
         $window.localStorage['jwtToken'] = response.data.token;
@@ -1729,53 +1729,57 @@ angular.module("flights/list.tpl.html", []).run(["$templateCache", function($tem
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("header.tpl.html",
-    "<div class=\"navbar navbar-default\" ng-controller=\"HeaderCtrl\">\n" +
-    "  <div class=\"container-fluid\">\n" +
-    "    <div class=\"navbar-header\">\n" +
-    "      <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-collapse\" aria-expanded=\"false\">\n" +
-    "        <span class=\"sr-only\">Toggle navigation</span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "        <span class=\"icon-bar\"></span>\n" +
-    "      </button>\n" +
-    "      <a class=\"navbar-brand\" href=\"#\">Log My Rocket</a>\n" +
-    "    </div>\n" +
+    "<div class=\"navbar-wrapper\">\n" +
+    "  <div class=\"container\">\n" +
+    "    <nav class=\"navbar navbar-default\" ng-controller=\"HeaderCtrl\">\n" +
+    "      <div class=\"container-fluid\">\n" +
+    "        <div class=\"navbar-header\">\n" +
+    "          <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">\n" +
+    "            <span class=\"sr-only\">Toggle navigation</span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "            <span class=\"icon-bar\"></span>\n" +
+    "          </button>\n" +
+    "          <a class=\"navbar-brand\" href=\"#\">Log My Rocket</a>\n" +
+    "        </div>\n" +
     "\n" +
-    "    <!-- Collect the nav links, forms, and other content for toggling -->\n" +
-    "    <div class=\"collapse navbar-collapse\">\n" +
-    "      <ul class=\"nav navbar-nav\">\n" +
-    "        <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
-    "        <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
+    "        <!-- Collect the nav links, forms, and other content for toggling -->\n" +
+    "        <div id=\"navbar\" class=\"collapse navbar-collapse\">\n" +
+    "          <ul class=\"nav navbar-nav\">\n" +
+    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
+    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
     "\n" +
-    "        <li>\n" +
-    "          <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
-    "            <li class=\"divider-vertical\"></li>\n" +
-    "            <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
-    "          </ul>\n" +
-    "        </li>\n" +
-    "      </ul>\n" +
-    "\n" +
-    "      <ul class=\"nav navbar-nav navbar-left\">\n" +
-    "        <li ng-show=\"isAuthenticated()\">\n" +
-    "          <form class=\"navbar-form\">\n" +
-    "            <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "            <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
-    "          </form>\n" +
-    "        </li>\n" +
-    "      </ul>\n" +
-    "      <login-toolbar></login-toolbar>\n" +
-    "    </div>\n" +
-    "    <div>\n" +
-    "        <ul class=\"breadcrumb\">\n" +
-    "            <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
-    "                <span class=\"divider\">/</span>\n" +
-    "                <ng-switch on=\"$last\">\n" +
-    "                    <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
-    "                    <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
-    "                </ng-switch>\n" +
+    "            <li>\n" +
+    "              <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
+    "                <li class=\"divider-vertical\"></li>\n" +
+    "                <li><a href=\"#\"><img src=\"/static/img/spinner.gif\"></a></li>\n" +
+    "              </ul>\n" +
     "            </li>\n" +
-    "        </ul>\n" +
-    "    </div>\n" +
+    "          </ul>\n" +
+    "\n" +
+    "          <ul class=\"nav navbar-nav navbar-left\">\n" +
+    "            <li ng-show=\"isAuthenticated()\">\n" +
+    "              <form class=\"navbar-form\">\n" +
+    "                <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
+    "                <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
+    "              </form>\n" +
+    "            </li>\n" +
+    "          </ul>\n" +
+    "          <login-toolbar></login-toolbar>\n" +
+    "        </div>\n" +
+    "        <div>\n" +
+    "            <ul class=\"breadcrumb\">\n" +
+    "                <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
+    "                    <span class=\"divider\">/</span>\n" +
+    "                    <ng-switch on=\"$last\">\n" +
+    "                        <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
+    "                        <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
+    "                    </ng-switch>\n" +
+    "                </li>\n" +
+    "            </ul>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </nav>\n" +
     "  </div>\n" +
     "</div>");
 }]);

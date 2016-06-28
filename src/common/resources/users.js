@@ -2,7 +2,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   var Users = {};
 
   Users.createUser = function(user){
-    return $http.post('https://logmyrocket.info/api/signup',
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/signup',
       user,
       {
         headers: {
@@ -12,7 +12,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   };
 
   Users.updateSettings = function(settings){
-    return $http.put('https://logmyrocket.info/api/settings',
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/settings',
       {
         'settings': settings,
       },
@@ -25,7 +25,7 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
   };
 
   Users.getSettings = function(){
-    return $http.get('https://logmyrocket.info/api/settings',
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/settings',
       {
         headers: {
           'Authorization': 'Bearer ' + security.getToken(),

@@ -2,7 +2,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   var Flights = {};
 
   Flights.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/flights', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -14,7 +14,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.newFlight = function(rocket, flight){
-    return $http.post('https://logmyrocket.info/api/flights',{
+    return $http.post('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights',{
         'rocket_data': rocket,
         'flight_data': flight
       },
@@ -31,7 +31,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.getFlight = function(flight_id){
-    return $http.get('https://logmyrocket.info/api/flights/' + flight_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -43,7 +43,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.updateFlight = function(flight_id, flight_data){
-    return $http.put('https://logmyrocket.info/api/flights/' + flight_id,{
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id,{
         'flight_data': flight_data,
       },
       {
@@ -59,7 +59,7 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
   };
 
   Flights.deleteFlight = function(flight_id){
-    return $http.delete('https://logmyrocket.info/api/flights/' + flight_id, {
+    return $http.delete('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/flights/' + flight_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()

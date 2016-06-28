@@ -2,7 +2,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   var Motors = {};
 
   Motors.getMotorsByDiameter = function(diameter){
-    return $http.get('https://logmyrocket.info/api/motors/diameter/' + diameter, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors/diameter/' + diameter, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -11,7 +11,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   };
 
   Motors.getAll = function(){
-    return $http.get('https://logmyrocket.info/api/motors', {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors', {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
@@ -20,7 +20,7 @@ angular.module('resources.motors', []).factory('Motors', ['$http', 'security', '
   };
 
   Motors.getMotor = function(motor_id){
-    return $http.get('https://logmyrocket.info/api/motors/' + motor_id, {
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/motors/' + motor_id, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + security.getToken()
