@@ -11,6 +11,7 @@ angular.module('app', [
   'flights',
   'rockets',
   'settings',
+  'myMotors',
   'services.breadcrumbs',
   'services.i18nNotifications',
   'services.httpRequestTracker',

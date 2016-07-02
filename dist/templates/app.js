@@ -1,4 +1,4 @@
-angular.module('templates.app', ['addRocket/list.tpl.html', 'editRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html', 'settings/list.tpl.html', 'viewFlight/list.tpl.html']);
+angular.module('templates.app', ['addRocket/list.tpl.html', 'editRocket/list.tpl.html', 'flightCard/list.tpl.html', 'flights/list.tpl.html', 'header.tpl.html', 'myMotors/list.tpl.html', 'myMotors/motor_chooser_form.tpl.html', 'newFlight/list.tpl.html', 'newFlight/motor_chooser_form.tpl.html', 'notifications.tpl.html', 'postFlightData/list.tpl.html', 'preFlightChecklist/list.tpl.html', 'rockets/list.tpl.html', 'settings/list.tpl.html', 'viewFlight/list.tpl.html']);
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
@@ -6,23 +6,23 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketName\" class=\"col-sm-3 control-label\">Rocket Name:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketName\" ng-model=\"rocket.name\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRocketMfg\" class=\"col-sm-2 control-label\">Rocket Manufacturer:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketMfg\" class=\"col-sm-3 control-label\">Rocket Manufacturer:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketMfg\" ng-model=\"rocket.mfg\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRocketColors\" class=\"col-sm-2 control-label\">Rocket Colors:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketColors\" class=\"col-sm-3 control-label\">Rocket Colors:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketColors\" ng-model=\"rocket.colors\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRecoveryMode\" class=\"col-sm-2 control-label\">Recovery Mode:</label>\n" +
-    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "    <label for=\"inputRecoveryMode\" class=\"col-sm-3 control-label\">Recovery Mode:</label>\n" +
+    "    <div class=\"btn-group col-sm-7\" uib-dropdown>\n" +
     "      <button id=\"inputRecoveryMode\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
     "        {{ rocket.recovery }}\n" +
     "        <span class=\"caret\"></span>\n" +
@@ -32,8 +32,8 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRodSize\" class=\"col-sm-2 control-label\">Rod/Rail Size:</label>\n" +
-    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "    <label for=\"inputRodSize\" class=\"col-sm-3 control-label\">Rod/Rail Size:</label>\n" +
+    "    <div class=\"btn-group col-sm-7\" uib-dropdown>\n" +
     "      <button id=\"inputRodSize\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
     "        {{ rocket.rod }}\n" +
     "        <span class=\"caret\"></span>\n" +
@@ -43,8 +43,8 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputMotorConfig\" class=\"col-sm-2 control-label\">Motor Configuration:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputMotorConfig\" class=\"col-sm-3 control-label\">Motor Configuration:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"stage in rocket.motors track by $index\">\n" +
     "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
@@ -86,8 +86,8 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-2 control-label\">Pre-Flight Checklist Items:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-3 control-label\">Pre-Flight Checklist Items:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputPreFlightChecklist\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"a in rocket.preflight track by $index\">\n" +
     "          <input type=\"text\" class=\"form-control\" ng-model=\"rocket.preflight[$index]\" />\n" +
@@ -100,15 +100,15 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputNotes\" class=\"col-sm-2 control-label\">Notes:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputNotes\" class=\"col-sm-3 control-label\">Notes:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <textarea class=\"form-control\" rows=\"5\" id=\"inputNotes\" ng-model=\"rocket.notes\"></textarea>\n" +
     "    </div>\n" +
     "\n" +
     "  </div>\n" +
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-12\">\n" +
-    "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "      <button ng-click=\"submit()\" class=\"btn btn-default center-block\">\n" +
     "        Create Rocket\n" +
     "      </button>\n" +
     "    </div>\n" +
@@ -122,23 +122,23 @@ angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($
     "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketName\" class=\"col-sm-3 control-label\">Rocket Name:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketName\" ng-model=\"rocket.name\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRocketMfg\" class=\"col-sm-2 control-label\">Rocket Manufacturer:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketMfg\" class=\"col-sm-3 control-label\">Rocket Manufacturer:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketMfg\" ng-model=\"rocket.mfg\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRocketColors\" class=\"col-sm-2 control-label\">Rocket Colors:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputRocketColors\" class=\"col-sm-3 control-label\">Rocket Colors:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"inputRocketColors\" ng-model=\"rocket.colors\" />\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRecoveryMode\" class=\"col-sm-2 control-label\">Recovery Mode:</label>\n" +
-    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "    <label for=\"inputRecoveryMode\" class=\"col-sm-3 control-label\">Recovery Mode:</label>\n" +
+    "    <div class=\"btn-group col-sm-7\" uib-dropdown>\n" +
     "      <button id=\"inputRecoveryMode\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
     "        {{ rocket.recovery }}\n" +
     "        <span class=\"caret\"></span>\n" +
@@ -148,8 +148,8 @@ angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputRodSize\" class=\"col-sm-2 control-label\">Rod/Rail Size:</label>\n" +
-    "    <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
+    "    <label for=\"inputRodSize\" class=\"col-sm-3 control-label\">Rod/Rail Size:</label>\n" +
+    "    <div class=\"btn-group col-sm-7\" uib-dropdown>\n" +
     "      <button id=\"inputRodSize\" type=\"button\" class=\"btn btn-primary\" uib-dropdown-toggle ng-disabled=\"disabled\">\n" +
     "        {{ rocket.rod }}\n" +
     "        <span class=\"caret\"></span>\n" +
@@ -159,8 +159,8 @@ angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputMotorConfig\" class=\"col-sm-2 control-label\">Motor Configuration:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputMotorConfig\" class=\"col-sm-3 control-label\">Motor Configuration:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"stage in rocket.motors track by $index\">\n" +
     "          <label>Stage ({{ $index + 1 }}):  </label>\n" +
@@ -202,8 +202,8 @@ angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-2 control-label\">Pre-Flight Checklist Items:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputPreFlightChecklist\" class=\"col-sm-3 control-label\">Pre-Flight Checklist Items:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputPreFlightChecklist\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"a in rocket.preflight track by $index\">\n" +
     "          <input type=\"text\" class=\"form-control\" ng-model=\"rocket.preflight[$index]\" />\n" +
@@ -216,15 +216,15 @@ angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "\n" +
-    "    <label for=\"inputNotes\" class=\"col-sm-2 control-label\">Notes:</label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"inputNotes\" class=\"col-sm-3 control-label\">Notes:</label>\n" +
+    "    <div class=\"col-sm-7\">\n" +
     "      <textarea class=\"form-control\" rows=\"5\" id=\"inputNotes\" ng-model=\"rocket.notes\"></textarea>\n" +
     "    </div>\n" +
     "\n" +
     "  </div>\n" +
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-12\">\n" +
-    "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "      <button ng-click=\"submit()\" class=\"btn btn-default center-block\">\n" +
     "        Update Rocket\n" +
     "      </button>\n" +
     "    </div>\n" +
@@ -361,6 +361,70 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "</div>");
 }]);
 
+angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("myMotors/list.tpl.html",
+    "<h3>My Motors</h3>\n" +
+    "\n" +
+    "<form class=\"form-horizontal\" role=\"form\">\n" +
+    "  <div>\n" +
+    "    <ul class=\"list-group\">\n" +
+    "      <li class=\"list-group-item\" ng-repeat=\"motor in motors track by $index\">\n" +
+    "        <div>\n" +
+    "          {{ motor.count }} -\n" +
+    "          {{ motor.motor['manufacturer'] }} -\n" +
+    "          {{ motor.motor['common-name'] }}\n" +
+    "        </div>\n" +
+    "      </li>\n" +
+    "    </ul>\n" +
+    "  </div>\n" +
+    "  <div class=\"btn-group\">\n" +
+    "    <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
+    "      Add Motor\n" +
+    "    </button>\n" +
+    "  </div>\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <div class=\"col-sm-12\">\n" +
+    "      <button ng-click=\"finish()\" class=\"btn btn-default\">\n" +
+    "        Finish\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
+angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("myMotors/motor_chooser_form.tpl.html",
+    "<form name=\"form\" novalidate class=\"login-form\">\n" +
+    "  <div class=\"modal-header\">\n" +
+    "    <h4>Choose a motor</h4>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-body\">\n" +
+    "    <div>\n" +
+    "      <label for=\"selectDia\">Select Motor Diameter: </label><br>\n" +
+    "      <select name=\"select\" id=\"selectDia\" ng-model=\"data.selectDia\" ng-change=\"changeDia()\">\n" +
+    "        <option ng-repeat=\"dia in allDias track by $index\" value=\"{{ dia }}\">{{ dia }}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      <label for=\"selectMotor\">Select Manufacturer: </label><br>\n" +
+    "      <select name=\"select\" id=\"selectMfg\" ng-model=\"data.selectMfg\" ng-change=\"changeMfg()\">\n" +
+    "        <option ng-repeat=\"mfg in allMfg\" value=\"{{ mfg }}\">{{ mfg }}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      <label for=\"selectMotor\">Select Motor: </label><br>\n" +
+    "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\">\n" +
+    "        <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['common-name'] }}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"modal-footer\">\n" +
+    "    <button class=\"btn btn-primary login\" ng-click=\"choose()\" ng-disabled='form.$invalid'>Ok</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancel()\">Cancel</button>\n" +
+    "  </div>\n" +
+    "</form>");
+}]);
+
 angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("newFlight/list.tpl.html",
     "<h3>New Flight</h3>\n" +
@@ -417,15 +481,14 @@ angular.module("newFlight/motor_chooser_form.tpl.html", []).run(["$templateCache
     "    <h4>Choose a motor</h4>\n" +
     "  </div>\n" +
     "  <div class=\"modal-body\">\n" +
-    "    <label for=\"multipleSelect\"> Multiple select: </label><br>\n" +
-    "    <select name=\"multipleSelect\" id=\"multipleSelect\" ng-model=\"data.multipleSelect\" multiple>\n" +
-    "      <option ng-repeat=\"motor in allMotors\" value=\"{{ motor }}\">{{ motor['manufacturer-abbrev'] }} - {{ motor['common-name'] }}</option>\n" +
+    "    <label for=\"select\"> Select a motor from your collection: </label><br>\n" +
+    "    <select name=\"select\" id=\"select\" ng-model=\"data.select\">\n" +
+    "      <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['motor']['manufacturer-abbrev'] }} - {{ motor['motor']['common-name'] }}</option>\n" +
     "    </select>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +
     "    <button class=\"btn btn-primary login\" ng-click=\"choose()\" ng-disabled='form.$invalid'>Ok</button>\n" +
-    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
-    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
+    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancel()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
 }]);
@@ -504,22 +567,22 @@ angular.module("settings/list.tpl.html", []).run(["$templateCache", function($te
     "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <label for=\"organization\" class=\"col-sm-2 control-label\">Organization (NAR/Tripoli): </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"organization\" class=\"col-sm-4 control-label\">Organization (NAR/Tripoli): </label>\n" +
+    "    <div class=\"col-sm-6\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"organization\" ng-model=\"user.organization\" />\n" +
     "    </div>\n" +
-    "    <label for=\"membershipNum\" class=\"col-sm-2 control-label\">Membership Number: </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"membershipNum\" class=\"col-sm-4 control-label\">Membership Number: </label>\n" +
+    "    <div class=\"col-sm-6\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"membershipNum\" ng-model=\"user.membership_num\" />\n" +
     "    </div>\n" +
-    "    <label for=\"level\" class=\"col-sm-2 control-label\">Level: </label>\n" +
-    "    <div class=\"col-sm-10\">\n" +
+    "    <label for=\"level\" class=\"col-sm-4 control-label\">Level: </label>\n" +
+    "    <div class=\"col-sm-6\">\n" +
     "      <input type=\"text\" class=\"form-control\" id=\"level\" ng-model=\"user.level\" />\n" +
     "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"form-group\">\n" +
     "    <div class=\"col-sm-12\">\n" +
-    "      <button ng-click=\"submit()\" class=\"btn btn-default\">\n" +
+    "      <button ng-click=\"submit()\" class=\"btn btn-default center-block\">\n" +
     "        Update Settings\n" +
     "      </button>\n" +
     "    </div>\n" +

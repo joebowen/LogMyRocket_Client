@@ -19,7 +19,10 @@ angular.module('security.login.toolbar', [])
       });
       $scope.settings = function() {
         $location.path('/settings');
-      }
+      };
+      $scope.myMotors = function() {
+        $location.path('/my-motors');
+      };
     }
   };
   return directive;

@@ -12,17 +12,25 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
   });
 }])
 
-.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', '$uibModal', '$routeParams', '$location', function($scope, Flights, Rockets, $uibModal, $routeParams, $location){
+.controller('NewFlightCtrl', ['$scope', 'Flights', 'Rockets', 'Users', '$uibModal', '$routeParams', '$location', function($scope, Flights, Rockets, Users, $uibModal, $routeParams, $location){
   $scope.flight = {};
 
   Rockets.getAll()
     .then(function(response){
       $scope.rockets = response.data;
       $scope.rocket = $scope.rockets[0];
-      $scope.motor_spec = $scope.rocket.rocket_data.motors;
     });
 
   $scope.submit = function() {
+
+    for (stage in $scope.rocket.rocket_data.motors) {
+      for (motor in $scope.rocket.rocket_data.motors[stage]){
+        Users.delMotor($scope.rocket.rocket_data.motors[stage][motor].motor['motor-id']);
+      }
+    }
+
+    //Users.delMotor(JSON.parse($scope.data.select)['motor']['motor-id']);
+
     $scope.flight.create = Date.now();
     Flights.newFlight($scope.rocket, $scope.flight).then(function(data) {
       flight_id = data.flight_id;
@@ -32,7 +40,6 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
 
   $scope.rocketItemSelected = function(rocket) {
     $scope.rocket = rocket;
-    $scope.motor_spec = rocket.rocket_data.motors;
   };
 
   var motorChooserDialog = null;
@@ -61,7 +68,7 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
 
   function onMotorChooserDialogClose(success) {
     motorChooserDialog = null;
-    $scope.motor_spec[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
+    $scope.rocket.rocket_data.motors[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
   };
 
 }]);

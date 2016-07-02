@@ -35,17 +35,18 @@ angular.module("security/login/signup.tpl.html", []).run(["$templateCache", func
     "    <h4>Signup</h4>\n" +
     "  </div>\n" +
     "  <div class=\"modal-body\">\n" +
-    "    <div class=\"alert alert-info\">Please enter your login details</div>\n" +
-    "    <label>Username</label>\n" +
-    "    <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
-    "    <label>Password</label>\n" +
-    "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
-    "    <label>Organization</label>\n" +
-    "    <input name=\"organization\" type=\"text\" ng-model=\"user.settings.organization\" required>\n" +
-    "    <label>Membership Number</label>\n" +
-    "    <input name=\"membership_num\" type=\"text\" ng-model=\"user.settings.membership_num\" required>\n" +
-    "    <label>Level</label>\n" +
-    "    <input name=\"level\" type=\"text\" ng-model=\"user.settings.level\" required>\n" +
+    "    <label class=\"col-sm-3\">Username</label>\n" +
+    "    <input class=\"col-sm-9\" name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
+    "    <label class=\"col-sm-3\">Password</label>\n" +
+    "    <input class=\"col-sm-9\" name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
+    "    <label class=\"col-sm-3\">Email</label>\n" +
+    "    <input class=\"col-sm-9\" name=\"email\" type=\"text\" ng-model=\"user.email\" required>\n" +
+    "    <label class=\"col-sm-6\">Organization (Optional)</label>\n" +
+    "    <input class=\"col-sm-6\" name=\"organization\" type=\"text\" ng-model=\"user.settings.organization\">\n" +
+    "    <label class=\"col-sm-6\">Membership Number (Optional)</label>\n" +
+    "    <input class=\"col-sm-6\" name=\"membership_num\" type=\"text\" ng-model=\"user.settings.membership_num\">\n" +
+    "    <label class=\"col-sm-6\">Level (Optional)</label>\n" +
+    "    <input class=\"col-sm-6\" name=\"level\" type=\"text\" ng-model=\"user.settings.level\">\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +
     "    <button class=\"btn btn-primary login\" ng-click=\"signup()\" ng-disabled='form.$invalid'>Signup!</button>\n" +
@@ -59,6 +60,11 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
+    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
+    "      <form class=\"navbar-form\">\n" +
+    "          <button class=\"btn logout\" ng-click=\"myMotors()\">My Motors</button>\n" +
+    "      </form>\n" +
+    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"settings()\">Settings</button>\n" +

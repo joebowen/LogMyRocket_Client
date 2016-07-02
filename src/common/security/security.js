@@ -5,7 +5,7 @@ angular.module('security.service', [
   'ui.bootstrap'
 ])
 
-.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$uibModal', '$window', function($http, $q, $location, queue, $uibModal, $window) {
+.factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$uibModal', '$window', '$route', function($http, $q, $location, queue, $uibModal, $window, $route) {
 
   // Redirect to the given url (defaults to '/')
   function redirect(url) {
@@ -70,6 +70,7 @@ angular.module('security.service', [
         if ( service.isAuthenticated() ) {
           closeLoginDialog(true);
         }
+        $route.reload();
         return service.isAuthenticated();
       });
     },

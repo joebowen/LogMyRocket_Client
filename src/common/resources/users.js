@@ -34,5 +34,38 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
       });
   };
 
+  Users.getMotors = function(){
+    return $http.get('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/my_motors',
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  Users.addMotor = function(motor){
+    return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/my_motors',
+      {
+        'motor': motor,
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
+  Users.delMotor = function(motor_id){
+    return $http.delete('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/my_motors/' + motor_id,
+      {
+        headers: {
+          'Authorization': 'Bearer ' + security.getToken(),
+          'Content-Type': 'application/json'
+        }
+      });
+  };
+
   return Users;
 }]);

@@ -3,14 +3,13 @@
     <h4>Choose a motor</h4>
   </div>
   <div class="modal-body">
-    <label for="multipleSelect"> Multiple select: </label><br>
-    <select name="multipleSelect" id="multipleSelect" ng-model="data.multipleSelect" multiple>
-      <option ng-repeat="motor in allMotors" value="{{ motor }}">{{ motor['manufacturer-abbrev'] }} - {{ motor['common-name'] }}</option>
+    <label for="select"> Select a motor from your collection: </label><br>
+    <select name="select" id="select" ng-model="data.select">
+      <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['motor']['manufacturer-abbrev'] }} - {{ motor['motor']['common-name'] }}</option>
     </select>
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary login" ng-click="choose()" ng-disabled='form.$invalid'>Ok</button>
-    <button class="btn clear" ng-click="clearForm()">Clear</button>
-    <button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
+    <button class="btn btn-warning cancel" ng-click="cancel()">Cancel</button>
   </div>
 </form>

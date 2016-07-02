@@ -1,4 +1,4 @@
-angular.module('rockets', ['resources.rockets'])
+angular.module('rockets', ['resources.rockets', 'security'])
 
 .config(['$routeProvider', function($routeProvider){
   $routeProvider.when('/rockets', {

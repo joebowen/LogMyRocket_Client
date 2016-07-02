@@ -1,0 +1,29 @@
+<form name="form" novalidate class="login-form">
+  <div class="modal-header">
+    <h4>Choose a motor</h4>
+  </div>
+  <div class="modal-body">
+    <div>
+      <label for="selectDia">Select Motor Diameter: </label><br>
+      <select name="select" id="selectDia" ng-model="data.selectDia" ng-change="changeDia()">
+        <option ng-repeat="dia in allDias track by $index" value="{{ dia }}">{{ dia }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="selectMotor">Select Manufacturer: </label><br>
+      <select name="select" id="selectMfg" ng-model="data.selectMfg" ng-change="changeMfg()">
+        <option ng-repeat="mfg in allMfg" value="{{ mfg }}">{{ mfg }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="selectMotor">Select Motor: </label><br>
+      <select name="select" id="selectMotor" ng-model="data.selectMotor">
+        <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['common-name'] }}</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary login" ng-click="choose()" ng-disabled='form.$invalid'>Ok</button>
+    <button class="btn btn-warning cancel" ng-click="cancel()">Cancel</button>
+  </div>
+</form>

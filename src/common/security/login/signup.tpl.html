@@ -3,17 +3,18 @@
     <h4>Signup</h4>
   </div>
   <div class="modal-body">
-    <div class="alert alert-info">Please enter your login details</div>
-    <label>Username</label>
-    <input name="login" type="text" ng-model="user.username" required autofocus>
-    <label>Password</label>
-    <input name="pass" type="password" ng-model="user.password" required>
-    <label>Organization</label>
-    <input name="organization" type="text" ng-model="user.settings.organization" required>
-    <label>Membership Number</label>
-    <input name="membership_num" type="text" ng-model="user.settings.membership_num" required>
-    <label>Level</label>
-    <input name="level" type="text" ng-model="user.settings.level" required>
+    <label class="col-sm-3">Username</label>
+    <input class="col-sm-9" name="login" type="text" ng-model="user.username" required autofocus>
+    <label class="col-sm-3">Password</label>
+    <input class="col-sm-9" name="pass" type="password" ng-model="user.password" required>
+    <label class="col-sm-3">Email</label>
+    <input class="col-sm-9" name="email" type="text" ng-model="user.email" required>
+    <label class="col-sm-6">Organization (Optional)</label>
+    <input class="col-sm-6" name="organization" type="text" ng-model="user.settings.organization">
+    <label class="col-sm-6">Membership Number (Optional)</label>
+    <input class="col-sm-6" name="membership_num" type="text" ng-model="user.settings.membership_num">
+    <label class="col-sm-6">Level (Optional)</label>
+    <input class="col-sm-6" name="level" type="text" ng-model="user.settings.level">
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary login" ng-click="signup()" ng-disabled='form.$invalid'>Signup!</button>
