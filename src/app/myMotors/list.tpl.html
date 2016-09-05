@@ -1,27 +1,30 @@
 <h3>My Motors</h3>
 
 <form class="form-horizontal" role="form">
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button ng-click="openMotorChooser()" class="btn btn-primary">
+        Add Motor
+      </button>
+    </div>
+  </div>
   <div>
     <ul class="list-group">
       <li class="list-group-item" ng-repeat="motor in motors track by $index">
         <div>
-          {{ motor.count }} -
-          {{ motor.motor['manufacturer'] }} -
-          {{ motor.motor['common-name'] }}
+          <div>
+            {{ motor.count }} -
+            {{ motor.motor['manufacturer'] }} -
+            {{ motor.motor['common-name'] }}
+            <button ng-click="addMotor(motor)" class="btn btn-default">
+              +
+            </button>
+            <button ng-click="delMotor(motor)" class="btn btn-default">
+              -
+            </button>
+          </div>
         </div>
       </li>
     </ul>
-  </div>
-  <div class="btn-group">
-    <button ng-click="openMotorChooser()" class="btn btn-primary">
-      Add Motor
-    </button>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <button ng-click="finish()" class="btn btn-default">
-        Finish
-      </button>
-    </div>
   </div>
 </form>

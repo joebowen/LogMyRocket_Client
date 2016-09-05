@@ -366,28 +366,31 @@ angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($te
     "<h3>My Motors</h3>\n" +
     "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
+    "  <div class=\"form-group\">\n" +
+    "    <div class=\"col-sm-12\">\n" +
+    "      <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
+    "        Add Motor\n" +
+    "      </button>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
     "  <div>\n" +
     "    <ul class=\"list-group\">\n" +
     "      <li class=\"list-group-item\" ng-repeat=\"motor in motors track by $index\">\n" +
     "        <div>\n" +
-    "          {{ motor.count }} -\n" +
-    "          {{ motor.motor['manufacturer'] }} -\n" +
-    "          {{ motor.motor['common-name'] }}\n" +
+    "          <div>\n" +
+    "            {{ motor.count }} -\n" +
+    "            {{ motor.motor['manufacturer'] }} -\n" +
+    "            {{ motor.motor['common-name'] }}\n" +
+    "            <button ng-click=\"addMotor(motor)\" class=\"btn btn-default\">\n" +
+    "              +\n" +
+    "            </button>\n" +
+    "            <button ng-click=\"delMotor(motor)\" class=\"btn btn-default\">\n" +
+    "              -\n" +
+    "            </button>\n" +
+    "          </div>\n" +
     "        </div>\n" +
     "      </li>\n" +
     "    </ul>\n" +
-    "  </div>\n" +
-    "  <div class=\"btn-group\">\n" +
-    "    <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
-    "      Add Motor\n" +
-    "    </button>\n" +
-    "  </div>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <div class=\"col-sm-12\">\n" +
-    "      <button ng-click=\"finish()\" class=\"btn btn-default\">\n" +
-    "        Finish\n" +
-    "      </button>\n" +
-    "    </div>\n" +
     "  </div>\n" +
     "</form>");
 }]);
@@ -416,6 +419,10 @@ angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache"
     "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\">\n" +
     "        <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['common-name'] }}</option>\n" +
     "      </select>\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      <label for=\"motorCnt\">Number of Motors: </label><br>\n" +
+    "      <input type=\"text\" class=\"form-control\" id=\"motorCnt\" ng-model=\"data.motorCnt\" />\n" +
     "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +

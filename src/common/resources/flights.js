@@ -9,7 +9,12 @@ angular.module('resources.flights', []).factory('Flights', ['$http', 'security',
         }
       })
       .then(function(response){
-        return response.data;
+        if (response.status === 200) {
+          return response.data;
+        }
+        else {
+          security.showLogin();
+        }
       });
   };
 

@@ -21,6 +21,10 @@
         <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['common-name'] }}</option>
       </select>
     </div>
+    <div>
+      <label for="motorCnt">Number of Motors: </label><br>
+      <input type="text" class="form-control" id="motorCnt" ng-model="data.motorCnt" />
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-primary login" ng-click="choose()" ng-disabled='form.$invalid'>Ok</button>

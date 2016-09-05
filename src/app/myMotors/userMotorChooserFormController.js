@@ -33,7 +33,8 @@ angular.module('myMotors.motor_chooser_form', [])
 
   $scope.choose = function(){
     $uibModalInstance.close({
-      "motor": JSON.parse($scope.data.selectMotor)
+      "motor": JSON.parse($scope.data.selectMotor),
+      "count": $scope.data.motorCnt
     })
   };
 

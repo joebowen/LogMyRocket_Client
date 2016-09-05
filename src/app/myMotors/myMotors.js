@@ -26,6 +26,19 @@ angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
     motorChooserDialog.result.then(onMotorChooserDialogClose);
   };
 
+  $scope.addMotor = function(motor) {
+    Users.addMotor(motor.motor);
+    motor.count++;
+  };
+
+  $scope.delMotor = function(motor) {
+    Users.delMotor(motor.motor['motor-id']);
+    motor.count--;
+    if (motor.count <= 0) {
+        delete $scope.motors[motor.motor['motor-id']];
+    }
+  };
+
   function closeMotorChooserDialog(success) {
     if (motorChooserDialog) {
       motorChooserDialog.close(success);
@@ -35,14 +48,12 @@ angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
   function onMotorChooserDialogClose(success) {
     motorChooserDialog = null;
     if ('motor' in success) {
-      Users.addMotor(success['motor']);
+      for (cnt = 0; cnt < success['count']; cnt++) {
+        Users.addMotor(success['motor']);
+      }
       Users.getMotors().then(function(motors) {
         $scope.motors = motors.data;
       });
     }
-  };
-
-  $scope.finish = function() {
-    $location.path('/');
   };
 }]);
