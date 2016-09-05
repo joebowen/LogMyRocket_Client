@@ -271,10 +271,10 @@ angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
   };
 
   $scope.delMotor = function(motor) {
-    Users.delMotor(motor.motor['motor-id']);
+    Users.delMotor(motor.motor['motor-id'] + '-' + motor.delay);
     motor.count--;
     if (motor.count <= 0) {
-        delete $scope.motors[motor.motor['motor-id']];
+        delete $scope.motors[motor.motor['motor-id'] + '-' + motor.delay];
     }
   };
 
@@ -288,7 +288,7 @@ angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
     motorChooserDialog = null;
     if ('motor' in success) {
       for (cnt = 0; cnt < success['count']; cnt++) {
-        Users.addMotor(success['motor']);
+        Users.addMotor(success['motor'], success['delay']);
       }
       Users.getMotors().then(function(motors) {
         $scope.motors = motors.data;
@@ -314,6 +314,7 @@ angular.module('myMotors.motor_chooser_form', [])
   $scope.changeDia = function(){
     $scope.allMfg = [];
     $scope.motors = [];
+    $scope.delays = [];
     for (tempMotor of $scope.allMotors[$scope.data.selectDia]) {
       $scope.allMfg.push(tempMotor['manufacturer']);
     }
@@ -322,6 +323,7 @@ angular.module('myMotors.motor_chooser_form', [])
 
   $scope.changeMfg = function() {
     $scope.motors = [];
+    $scope.delays = [];
     for (tempMotor of $scope.allMotors[$scope.data.selectDia]) {
       if (tempMotor['manufacturer'] === $scope.data.selectMfg) {
         $scope.motors.push(tempMotor);
@@ -329,9 +331,14 @@ angular.module('myMotors.motor_chooser_form', [])
     }
   }
 
+  $scope.changeMotor = function() {
+    $scope.delays = JSON.parse($scope.data.selectMotor)['delays'].split(",")
+  }
+
   $scope.choose = function(){
     $uibModalInstance.close({
       "motor": JSON.parse($scope.data.selectMotor),
+      "delay": $scope.data.selectMotorDelay,
       "count": $scope.data.motorCnt
     })
   };
@@ -782,10 +789,11 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
       });
   };
 
-  Users.addMotor = function(motor){
+  Users.addMotor = function(motor, delay){
     return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/my_motors',
       {
         'motor': motor,
+        'delay': delay
       },
       {
         headers: {
@@ -1962,7 +1970,7 @@ angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($te
     "          <div>\n" +
     "            {{ motor.count }} -\n" +
     "            {{ motor.motor['manufacturer'] }} -\n" +
-    "            {{ motor.motor['common-name'] }}\n" +
+    "            {{ motor.motor['common-name'] }}-{{ motor.delay }}\n" +
     "            <button ng-click=\"addMotor(motor)\" class=\"btn btn-default\">\n" +
     "              +\n" +
     "            </button>\n" +
@@ -1998,8 +2006,14 @@ angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache"
     "    </div>\n" +
     "    <div>\n" +
     "      <label for=\"selectMotor\">Select Motor: </label><br>\n" +
-    "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\">\n" +
+    "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\" ng-change=\"changeMotor()\">\n" +
     "        <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['common-name'] }}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      <label for=\"selectMotor\">Select Motor Delay: </label><br>\n" +
+    "      <select name=\"select\" id=\"selectMotorDelay\" ng-model=\"data.selectMotorDelay\">\n" +
+    "        <option ng-repeat=\"delay in delays\" value=\"{{ delay }}\">{{ delay }}</option>\n" +
     "      </select>\n" +
     "    </div>\n" +
     "    <div>\n" +

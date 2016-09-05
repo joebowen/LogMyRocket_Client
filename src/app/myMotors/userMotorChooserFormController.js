@@ -16,6 +16,7 @@ angular.module('myMotors.motor_chooser_form', [])
   $scope.changeDia = function(){
     $scope.allMfg = [];
     $scope.motors = [];
+    $scope.delays = [];
     for (tempMotor of $scope.allMotors[$scope.data.selectDia]) {
       $scope.allMfg.push(tempMotor['manufacturer']);
     }
@@ -24,6 +25,7 @@ angular.module('myMotors.motor_chooser_form', [])
 
   $scope.changeMfg = function() {
     $scope.motors = [];
+    $scope.delays = [];
     for (tempMotor of $scope.allMotors[$scope.data.selectDia]) {
       if (tempMotor['manufacturer'] === $scope.data.selectMfg) {
         $scope.motors.push(tempMotor);
@@ -31,9 +33,14 @@ angular.module('myMotors.motor_chooser_form', [])
     }
   }
 
+  $scope.changeMotor = function() {
+    $scope.delays = JSON.parse($scope.data.selectMotor)['delays'].split(",")
+  }
+
   $scope.choose = function(){
     $uibModalInstance.close({
       "motor": JSON.parse($scope.data.selectMotor),
+      "delay": $scope.data.selectMotorDelay,
       "count": $scope.data.motorCnt
     })
   };

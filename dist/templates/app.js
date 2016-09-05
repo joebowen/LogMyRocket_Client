@@ -380,7 +380,7 @@ angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($te
     "          <div>\n" +
     "            {{ motor.count }} -\n" +
     "            {{ motor.motor['manufacturer'] }} -\n" +
-    "            {{ motor.motor['common-name'] }}\n" +
+    "            {{ motor.motor['common-name'] }}-{{ motor.delay }}\n" +
     "            <button ng-click=\"addMotor(motor)\" class=\"btn btn-default\">\n" +
     "              +\n" +
     "            </button>\n" +
@@ -416,8 +416,14 @@ angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache"
     "    </div>\n" +
     "    <div>\n" +
     "      <label for=\"selectMotor\">Select Motor: </label><br>\n" +
-    "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\">\n" +
+    "      <select name=\"select\" id=\"selectMotor\" ng-model=\"data.selectMotor\" ng-change=\"changeMotor()\">\n" +
     "        <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['common-name'] }}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "    <div>\n" +
+    "      <label for=\"selectMotor\">Select Motor Delay: </label><br>\n" +
+    "      <select name=\"select\" id=\"selectMotorDelay\" ng-model=\"data.selectMotorDelay\">\n" +
+    "        <option ng-repeat=\"delay in delays\" value=\"{{ delay }}\">{{ delay }}</option>\n" +
     "      </select>\n" +
     "    </div>\n" +
     "    <div>\n" +

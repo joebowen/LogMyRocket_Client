@@ -44,10 +44,11 @@ angular.module('resources.users', []).factory('Users', ['$http', 'security', '$l
       });
   };
 
-  Users.addMotor = function(motor){
+  Users.addMotor = function(motor, delay){
     return $http.put('https://ctxsjudlq1.execute-api.us-east-1.amazonaws.com/dev/my_motors',
       {
         'motor': motor,
+        'delay': delay
       },
       {
         headers: {

@@ -17,8 +17,14 @@
     </div>
     <div>
       <label for="selectMotor">Select Motor: </label><br>
-      <select name="select" id="selectMotor" ng-model="data.selectMotor">
+      <select name="select" id="selectMotor" ng-model="data.selectMotor" ng-change="changeMotor()">
         <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['common-name'] }}</option>
+      </select>
+    </div>
+    <div>
+      <label for="selectMotor">Select Motor Delay: </label><br>
+      <select name="select" id="selectMotorDelay" ng-model="data.selectMotorDelay">
+        <option ng-repeat="delay in delays" value="{{ delay }}">{{ delay }}</option>
       </select>
     </div>
     <div>

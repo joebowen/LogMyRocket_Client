@@ -15,7 +15,7 @@
           <div>
             {{ motor.count }} -
             {{ motor.motor['manufacturer'] }} -
-            {{ motor.motor['common-name'] }}
+            {{ motor.motor['common-name'] }}-{{ motor.delay }}
             <button ng-click="addMotor(motor)" class="btn btn-default">
               +
             </button>
