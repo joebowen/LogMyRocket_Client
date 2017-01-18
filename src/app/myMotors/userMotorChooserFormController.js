@@ -37,6 +37,10 @@ angular.module('myMotors.motor_chooser_form', [])
     $scope.delays = JSON.parse($scope.data.selectMotor)['delays'].split(",")
   }
 
+  $scope.sorterFunc = function(dia){
+    return parseInt(dia);
+  };
+
   $scope.choose = function(){
     $uibModalInstance.close({
       "motor": JSON.parse($scope.data.selectMotor),

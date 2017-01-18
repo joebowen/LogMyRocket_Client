@@ -1,6 +1,6 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2016-09-05
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2017-01-17
  * https://github.com/joebowen/LogMyRocket_Client
- * Copyright (c) 2016 Joe Bowen;
+ * Copyright (c) 2017 Joe Bowen;
  * Licensed MIT
  */
 angular.module('addRocket', ['resources.rockets'])
@@ -240,7 +240,7 @@ angular.module('flights', ['resources.flights'])
 angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
 
 .config(['$routeProvider', function($routeProvider){
-  $routeProvider.when('/my-motors', {
+  $routeProvider.when('/motors', {
     templateUrl:'myMotors/list.tpl.html',
     controller:'MyMotorsCtrl'
   });
@@ -335,6 +335,10 @@ angular.module('myMotors.motor_chooser_form', [])
     $scope.delays = JSON.parse($scope.data.selectMotor)['delays'].split(",")
   }
 
+  $scope.sorterFunc = function(dia){
+    return parseInt(dia);
+  };
+
   $scope.choose = function(){
     $uibModalInstance.close({
       "motor": JSON.parse($scope.data.selectMotor),
@@ -371,7 +375,8 @@ angular.module('newFlight.motor_chooser_form', ['resources.users'])
     $uibModalInstance.close({
       "stage-index": $scope.stageIndex,
       "motor-index": $scope.motorIndex,
-      "motor": JSON.parse($scope.data.select)['motor']
+      "motor": JSON.parse($scope.data.select)['motor'],
+      "delay": JSON.parse($scope.data.select)['delay']
     });
   }
 }]);
@@ -449,6 +454,7 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
   function onMotorChooserDialogClose(success) {
     motorChooserDialog = null;
     $scope.rocket.rocket_data.motors[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
+    $scope.rocket.rocket_data.motors[success['stage-index']][success['motor-index']]['delay'] = success['delay'];
   };
 
 }]);
@@ -1008,7 +1014,7 @@ angular.module('security.login.toolbar', [])
         $location.path('/settings');
       };
       $scope.myMotors = function() {
-        $location.path('/my-motors');
+        $location.path('/motors');
       };
     }
   };
@@ -1592,8 +1598,6 @@ angular.module('templates.app', ['addRocket/list.tpl.html', 'editRocket/list.tpl
 
 angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("addRocket/list.tpl.html",
-    "<h3>Add Rocket</h3>\n" +
-    "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
     "    <label for=\"inputRocketName\" class=\"col-sm-3 control-label\">Rocket Name:</label>\n" +
@@ -1708,8 +1712,6 @@ angular.module("addRocket/list.tpl.html", []).run(["$templateCache", function($t
 
 angular.module("editRocket/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("editRocket/list.tpl.html",
-    "<h3>Edit Rocket</h3>\n" +
-    "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
     "    <label for=\"inputRocketName\" class=\"col-sm-3 control-label\">Rocket Name:</label>\n" +
@@ -1857,7 +1859,7 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
     "          <ul>\n" +
     "            <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
     "              <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
-    "              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}-{{ motor_spec.delay }}</label>\n" +
     "            </li>\n" +
     "          </ul>\n" +
     "        </li>\n" +
@@ -1880,18 +1882,10 @@ angular.module("flightCard/list.tpl.html", []).run(["$templateCache", function($
 
 angular.module("flights/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("flights/list.tpl.html",
-    "<h3>My Flights</h3>\n" +
-    "\n" +
-    "<ul class=\"list-group\">\n" +
-    "  <li class=\"list-group-item\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
-    "    <div>\n" +
-    "      {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
-    "      {{ flight.rocket_data.rocket_data.name }}\n" +
-    "      <a class=\"btn btn-default\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Data</a>\n" +
-    "      <a class=\"btn btn-default\" href=\"/flights/view-flight/{{ flight.flight_id }}/\">View</a>\n" +
-    "    </div>\n" +
-    "  </li>\n" +
-    "</ul>");
+    "<div class=\"col-sm-12\" ng-repeat=\"flight in flights track by flight.flight_id\">\n" +
+    "  <a class=\"btn btn-default col-sm-12\" href=\"/flights/view-flight/{{ flight.flight_id }}/\"><span class=\"pull-left\">{{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }} - {{ flight.rocket_data.rocket_data.name }}</span></a>\n" +
+    "</div>\n" +
+    "");
 }]);
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
@@ -1913,8 +1907,8 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "        <!-- Collect the nav links, forms, and other content for toggling -->\n" +
     "        <div id=\"navbar\" class=\"collapse navbar-collapse\">\n" +
     "          <ul class=\"nav navbar-nav\">\n" +
-    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">My Rockets</a></li>\n" +
-    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">My Flights</a></li>\n" +
+    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">Rockets</a></li>\n" +
+    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">Flights</a></li>\n" +
     "\n" +
     "            <li>\n" +
     "              <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
@@ -1953,11 +1947,9 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
 
 angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("myMotors/list.tpl.html",
-    "<h3>My Motors</h3>\n" +
-    "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <div class=\"col-sm-12\">\n" +
+    "    <div class=\"row\">\n" +
     "      <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
     "        Add Motor\n" +
     "      </button>\n" +
@@ -1995,7 +1987,7 @@ angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache"
     "    <div>\n" +
     "      <label for=\"selectDia\">Select Motor Diameter: </label><br>\n" +
     "      <select name=\"select\" id=\"selectDia\" ng-model=\"data.selectDia\" ng-change=\"changeDia()\">\n" +
-    "        <option ng-repeat=\"dia in allDias track by $index\" value=\"{{ dia }}\">{{ dia }}</option>\n" +
+    "        <option ng-repeat=\"dia in allDias | orderBy:sorterFunc\" value=\"{{ dia }}\">{{ dia | number:0 }}mm</option>\n" +
     "      </select>\n" +
     "    </div>\n" +
     "    <div>\n" +
@@ -2030,8 +2022,6 @@ angular.module("myMotors/motor_chooser_form.tpl.html", []).run(["$templateCache"
 
 angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("newFlight/list.tpl.html",
-    "<h3>New Flight</h3>\n" +
-    "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <label for=\"inputRocketName\" class=\"col-sm-2 control-label\">Rocket Name:</label>\n" +
     "  <div class=\"btn-group col-sm-10\" uib-dropdown>\n" +
@@ -2055,7 +2045,7 @@ angular.module("newFlight/list.tpl.html", []).run(["$templateCache", function($t
     "          <li ng-repeat=\"motor_spec in stage track by $index\" role=\"menuitem\">\n" +
     "            <label>Motor ({{ $index + 1 }}) </label>\n" +
     "            <label>Diameter: {{ motor_spec.diameter }}mm</label>\n" +
-    "            <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>\n" +
+    "            <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}-{{ motor_spec.delay }}</label>\n" +
     "            <div class=\"btn-group\">\n" +
     "              <button ng-click=\"openMotorChooser($parent.$index, $index, motor_spec.diameter)\" class=\"btn btn-primary\">\n" +
     "                Pick Motor\n" +
@@ -2086,7 +2076,7 @@ angular.module("newFlight/motor_chooser_form.tpl.html", []).run(["$templateCache
     "  <div class=\"modal-body\">\n" +
     "    <label for=\"select\"> Select a motor from your collection: </label><br>\n" +
     "    <select name=\"select\" id=\"select\" ng-model=\"data.select\">\n" +
-    "      <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['motor']['manufacturer-abbrev'] }} - {{ motor['motor']['common-name'] }}</option>\n" +
+    "      <option ng-repeat=\"motor in motors\" value=\"{{ motor }}\">{{ motor['motor']['manufacturer-abbrev'] }} {{ motor['motor']['common-name'] }}-{{ motor['delay'] }}</option>\n" +
     "    </select>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer\">\n" +
@@ -2130,8 +2120,8 @@ angular.module("preFlightChecklist/list.tpl.html", []).run(["$templateCache", fu
     "\n" +
     "<uib-alert ng-repeat=\"alert in alerts\" type=\"{{alert.type}}\" close=\"closeAlert($index)\">{{alert.msg}}</uib-alert>\n" +
     "\n" +
-    "<div class=\"col-sm-12\">\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"row\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"preFlightChecklist\">\n" +
     "        <li class=\"list-group-item\" ng-repeat=\"item in flight.rocket_data.rocket_data.preflight track by $index\">\n" +
     "          <ul>\n" +
@@ -2152,22 +2142,14 @@ angular.module("preFlightChecklist/list.tpl.html", []).run(["$templateCache", fu
 
 angular.module("rockets/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("rockets/list.tpl.html",
-    "<h3>My Rockets</h3>\n" +
-    "\n" +
-    "<ul class=\"list-group\">\n" +
-    "  <li class=\"list-group-item\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
-    "    {{ rocket.rocket_data.name }}\n" +
-    "    <a class=\"btn btn-default\" href=\"/flights/new-flight/{{ rocket.rocket_id }}/\">New Flight</a>\n" +
-    "    <a class=\"btn btn-default\" href=\"/rockets/edit-rocket/{{ rocket.rocket_id }}/\">Edit Rocket</a>\n" +
-    "  </li>\n" +
-    "</ul>\n" +
+    "<div class=\"col-sm-4\" ng-repeat=\"rocket in rockets track by rocket.rocket_id\">\n" +
+    "  <a class=\"btn btn-default col-sm-12\" href=\"/rockets/edit-rocket/{{ rocket.rocket_id }}/\">{{ rocket.rocket_data.name }}</a>\n" +
+    "</div>\n" +
     "");
 }]);
 
 angular.module("settings/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("settings/list.tpl.html",
-    "<h3>User Settings</h3>\n" +
-    "\n" +
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
     "    <label for=\"organization\" class=\"col-sm-4 control-label\">Organization (NAR/Tripoli): </label>\n" +
@@ -2195,22 +2177,28 @@ angular.module("settings/list.tpl.html", []).run(["$templateCache", function($te
 
 angular.module("viewFlight/list.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("viewFlight/list.tpl.html",
-    "<h3>Flight</h3>\n" +
-    "\n" +
-    "<div class=\"col-sm-12\">\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"row\">\n" +
+    "    <h3>Flight</h3>\n" +
+    "  </div>\n" +
+    "  <div class=\"row\">\n" +
+    "    <a class=\"btn btn-primary\" href=\"/flights/post-flight/{{ flight.flight_id }}/\">Add Data</a>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label class=\"col-sm-2 control-label\">Motor Configuration: </label>\n" +
     "    <div class=\"col-sm-10\">\n" +
     "      <ul class=\"list-group\" aria-labelledby=\"inputMotorConfig\">\n" +
@@ -2226,13 +2214,13 @@ angular.module("viewFlight/list.tpl.html", []).run(["$templateCache", function($
     "      </ul>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}\n" +
     "  </div>\n" +
-    "  <div class=\"col-sm-12\">\n" +
+    "  <div class=\"row\">\n" +
     "    <label>Notes: </label> {{ flight.flight_data.notes }}\n" +
     "  </div>\n" +
     "  <div class=\"col-sm-offset-2 col-sm-10\">\n" +
@@ -2249,26 +2237,55 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
   $templateCache.put("security/login/form.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
     "  <div class=\"modal-header\">\n" +
-    "    <h4>Sign in</h4>\n" +
+    "    <h2>Log My Rocket</h2>\n" +
+    "    <h4>Model Rocket Flight Log</h4>\n" +
     "  </div>\n" +
-    "  <div class=\"modal-body\">\n" +
-    "    <div class=\"alert alert-warning\" ng-show=\"authReason\">\n" +
+    "  <div class=\"modal-footer panel-group\">\n" +
+    "    <div class=\"row alert alert-warning\" ng-show=\"authReason\">\n" +
     "      {{authReason}}\n" +
     "    </div>\n" +
-    "    <div class=\"alert alert-error\" ng-show=\"authError\">\n" +
+    "    <div class=\"row alert alert-error\" ng-show=\"authError\">\n" +
     "      {{authError}}\n" +
     "    </div>\n" +
-    "    <div class=\"alert alert-info\">Please enter your login details</div>\n" +
-    "    <label>Username</label>\n" +
-    "    <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
-    "    <label>Password</label>\n" +
-    "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
-    "  </div>\n" +
-    "  <div class=\"modal-footer\">\n" +
-    "    <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
-    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
-    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
-    "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
+    "    <div class=\"row\">\n" +
+    "      <div class=\"col-sm-6 panel panel-default\">\n" +
+    "        <div class=\"panel-body\">\n" +
+    "          <div class=\"row text-left\">\n" +
+    "            <ul class=\"list-group\">\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Track your fleet of model rockets.\n" +
+    "              </li>\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Keep track of your motor inventory.\n" +
+    "              </li>\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Track each flight and record flight details.\n" +
+    "              </li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "          <div class=\"row text-left\">\n" +
+    "            <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-2\">\n" +
+    "\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-4 form-group panel panel-default\">\n" +
+    "        <div class=\"panel-body\">\n" +
+    "          <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
+    "          </div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
+    "          </div>\n" +
+    "          <div class=\"row text-center\">\n" +
+    "            <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</form>");
 }]);
@@ -2276,10 +2293,10 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
 angular.module("security/login/signup.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("security/login/signup.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
-    "  <div class=\"modal-header\">\n" +
-    "    <h4>Signup</h4>\n" +
+    "  <div class=\"modal-header text-center\">\n" +
+    "    <h3>Signup</h3>\n" +
     "  </div>\n" +
-    "  <div class=\"modal-body\">\n" +
+    "  <div class=\"modal-footer\">\n" +
     "    <label class=\"col-sm-3\">Username</label>\n" +
     "    <input class=\"col-sm-9\" name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
     "    <label class=\"col-sm-3\">Password</label>\n" +
@@ -2292,10 +2309,7 @@ angular.module("security/login/signup.tpl.html", []).run(["$templateCache", func
     "    <input class=\"col-sm-6\" name=\"membership_num\" type=\"text\" ng-model=\"user.settings.membership_num\">\n" +
     "    <label class=\"col-sm-6\">Level (Optional)</label>\n" +
     "    <input class=\"col-sm-6\" name=\"level\" type=\"text\" ng-model=\"user.settings.level\">\n" +
-    "  </div>\n" +
-    "  <div class=\"modal-footer\">\n" +
     "    <button class=\"btn btn-primary login\" ng-click=\"signup()\" ng-disabled='form.$invalid'>Signup!</button>\n" +
-    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelSignup()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
@@ -2307,7 +2321,7 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
     "  <li class=\"divider-vertical\"></li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"myMotors()\">My Motors</button>\n" +
+    "          <button class=\"btn logout\" ng-click=\"myMotors()\">Motors</button>\n" +
     "      </form>\n" +
     "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +

@@ -4,26 +4,55 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
   $templateCache.put("security/login/form.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
     "  <div class=\"modal-header\">\n" +
-    "    <h4>Sign in</h4>\n" +
+    "    <h2>Log My Rocket</h2>\n" +
+    "    <h4>Model Rocket Flight Log</h4>\n" +
     "  </div>\n" +
-    "  <div class=\"modal-body\">\n" +
-    "    <div class=\"alert alert-warning\" ng-show=\"authReason\">\n" +
+    "  <div class=\"modal-footer panel-group\">\n" +
+    "    <div class=\"row alert alert-warning\" ng-show=\"authReason\">\n" +
     "      {{authReason}}\n" +
     "    </div>\n" +
-    "    <div class=\"alert alert-error\" ng-show=\"authError\">\n" +
+    "    <div class=\"row alert alert-error\" ng-show=\"authError\">\n" +
     "      {{authError}}\n" +
     "    </div>\n" +
-    "    <div class=\"alert alert-info\">Please enter your login details</div>\n" +
-    "    <label>Username</label>\n" +
-    "    <input name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
-    "    <label>Password</label>\n" +
-    "    <input name=\"pass\" type=\"password\" ng-model=\"user.password\" required>\n" +
-    "  </div>\n" +
-    "  <div class=\"modal-footer\">\n" +
-    "    <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
-    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
-    "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelLogin()\">Cancel</button>\n" +
-    "    <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign up</button>\n" +
+    "    <div class=\"row\">\n" +
+    "      <div class=\"col-sm-6 panel panel-default\">\n" +
+    "        <div class=\"panel-body\">\n" +
+    "          <div class=\"row text-left\">\n" +
+    "            <ul class=\"list-group\">\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Track your fleet of model rockets.\n" +
+    "              </li>\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Keep track of your motor inventory.\n" +
+    "              </li>\n" +
+    "              <li class=\"list-group-item\">\n" +
+    "                Track each flight and record flight details.\n" +
+    "              </li>\n" +
+    "            </ul>\n" +
+    "          </div>\n" +
+    "          <div class=\"row text-left\">\n" +
+    "            <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-2\">\n" +
+    "\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-4 form-group panel panel-default\">\n" +
+    "        <div class=\"panel-body\">\n" +
+    "          <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
+    "          </div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
+    "          </div>\n" +
+    "          <div class=\"row text-center\">\n" +
+    "            <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</form>");
 }]);
@@ -31,10 +60,10 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
 angular.module("security/login/signup.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("security/login/signup.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
-    "  <div class=\"modal-header\">\n" +
-    "    <h4>Signup</h4>\n" +
+    "  <div class=\"modal-header text-center\">\n" +
+    "    <h3>Signup</h3>\n" +
     "  </div>\n" +
-    "  <div class=\"modal-body\">\n" +
+    "  <div class=\"modal-footer\">\n" +
     "    <label class=\"col-sm-3\">Username</label>\n" +
     "    <input class=\"col-sm-9\" name=\"login\" type=\"text\" ng-model=\"user.username\" required autofocus>\n" +
     "    <label class=\"col-sm-3\">Password</label>\n" +
@@ -47,10 +76,7 @@ angular.module("security/login/signup.tpl.html", []).run(["$templateCache", func
     "    <input class=\"col-sm-6\" name=\"membership_num\" type=\"text\" ng-model=\"user.settings.membership_num\">\n" +
     "    <label class=\"col-sm-6\">Level (Optional)</label>\n" +
     "    <input class=\"col-sm-6\" name=\"level\" type=\"text\" ng-model=\"user.settings.level\">\n" +
-    "  </div>\n" +
-    "  <div class=\"modal-footer\">\n" +
     "    <button class=\"btn btn-primary login\" ng-click=\"signup()\" ng-disabled='form.$invalid'>Signup!</button>\n" +
-    "    <button class=\"btn clear\" ng-click=\"clearForm()\">Clear</button>\n" +
     "    <button class=\"btn btn-warning cancel\" ng-click=\"cancelSignup()\">Cancel</button>\n" +
     "  </div>\n" +
     "</form>");
@@ -62,7 +88,7 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
     "  <li class=\"divider-vertical\"></li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"myMotors()\">My Motors</button>\n" +
+    "          <button class=\"btn logout\" ng-click=\"myMotors()\">Motors</button>\n" +
     "      </form>\n" +
     "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +

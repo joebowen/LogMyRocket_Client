@@ -1,19 +1,25 @@
-<h3>Flight</h3>
-
-<div class="col-sm-12">
-  <div class="col-sm-12">
+<div class="row">
+  <div class="row">
+    <h3>Flight</h3>
+  </div>
+  <div class="row">
+    <a class="btn btn-primary" href="/flights/post-flight/{{ flight.flight_id }}/">Add Data</a>
+  </div>
+</div>
+<div class="row">
+  <div class="row">
     <label>Date: </label> {{ flight.flight_data.create  | date:'yyyy-MM-dd h:mm a' }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Rocket Name: </label> {{ flight.rocket_data.rocket_data.name }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Rocket Manufacturer: </label> {{ flight.rocket_data.rocket_data.mfg }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Rocket Colors: </label> {{ flight.rocket_data.rocket_data.colors }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label class="col-sm-2 control-label">Motor Configuration: </label>
     <div class="col-sm-10">
       <ul class="list-group" aria-labelledby="inputMotorConfig">
@@ -29,13 +35,13 @@
       </ul>
     </div>
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Launch Rod Size: </label> {{ flight.rocket_data.rocket_data.rod }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Rocket Recovery System: </label> {{ flight.rocket_data.rocket_data.recovery }}
   </div>
-  <div class="col-sm-12">
+  <div class="row">
     <label>Notes: </label> {{ flight.flight_data.notes }}
   </div>
   <div class="col-sm-offset-2 col-sm-10">

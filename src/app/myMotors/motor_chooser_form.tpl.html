@@ -6,7 +6,7 @@
     <div>
       <label for="selectDia">Select Motor Diameter: </label><br>
       <select name="select" id="selectDia" ng-model="data.selectDia" ng-change="changeDia()">
-        <option ng-repeat="dia in allDias track by $index" value="{{ dia }}">{{ dia }}</option>
+        <option ng-repeat="dia in allDias | orderBy:sorterFunc" value="{{ dia }}">{{ dia | number:0 }}mm</option>
       </select>
     </div>
     <div>

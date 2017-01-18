@@ -5,7 +5,7 @@
   <div class="modal-body">
     <label for="select"> Select a motor from your collection: </label><br>
     <select name="select" id="select" ng-model="data.select">
-      <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['motor']['manufacturer-abbrev'] }} - {{ motor['motor']['common-name'] }}</option>
+      <option ng-repeat="motor in motors" value="{{ motor }}">{{ motor['motor']['manufacturer-abbrev'] }} {{ motor['motor']['common-name'] }}-{{ motor['delay'] }}</option>
     </select>
   </div>
   <div class="modal-footer">

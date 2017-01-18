@@ -1,7 +1,7 @@
 angular.module('myMotors', ['resources.users', 'myMotors.motor_chooser_form'])
 
 .config(['$routeProvider', function($routeProvider){
-  $routeProvider.when('/my-motors', {
+  $routeProvider.when('/motors', {
     templateUrl:'myMotors/list.tpl.html',
     controller:'MyMotorsCtrl'
   });

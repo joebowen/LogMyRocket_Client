@@ -21,7 +21,7 @@ angular.module('security.login.toolbar', [])
         $location.path('/settings');
       };
       $scope.myMotors = function() {
-        $location.path('/my-motors');
+        $location.path('/motors');
       };
     }
   };

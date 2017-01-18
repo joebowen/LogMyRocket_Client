@@ -69,6 +69,7 @@ angular.module('newFlight', ['resources.flights', 'resources.motors', 'newFlight
   function onMotorChooserDialogClose(success) {
     motorChooserDialog = null;
     $scope.rocket.rocket_data.motors[success['stage-index']][success['motor-index']]['motor'] = success['motor'];
+    $scope.rocket.rocket_data.motors[success['stage-index']][success['motor-index']]['delay'] = success['delay'];
   };
 
 }]);

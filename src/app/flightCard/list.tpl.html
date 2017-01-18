@@ -31,7 +31,7 @@
           <ul>
             <li ng-repeat="motor_spec in stage track by $index" role="menuitem">
               <label>Diameter: {{ motor_spec.diameter }}mm</label>
-              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}</label>
+              <label>Motor: {{ motor_spec.motor['manufacturer-abbrev'] }} {{ motor_spec.motor['common-name'] }}-{{ motor_spec.delay }}</label>
             </li>
           </ul>
         </li>

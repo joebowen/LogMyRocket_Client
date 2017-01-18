@@ -19,7 +19,8 @@ angular.module('newFlight.motor_chooser_form', ['resources.users'])
     $uibModalInstance.close({
       "stage-index": $scope.stageIndex,
       "motor-index": $scope.motorIndex,
-      "motor": JSON.parse($scope.data.select)['motor']
+      "motor": JSON.parse($scope.data.select)['motor'],
+      "delay": JSON.parse($scope.data.select)['delay']
     });
   }
 }]);
