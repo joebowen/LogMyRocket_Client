@@ -4,8 +4,21 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
   $templateCache.put("security/login/form.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
     "  <div class=\"modal-header\">\n" +
-    "    <h2>Log My Rocket</h2>\n" +
-    "    <h4>Model Rocket Flight Log</h4>\n" +
+    "    <div class=\"col-sm-12 intro-header\">\n" +
+    "      <div class=\"col-sm-8\">\n" +
+    "        <h2>\n" +
+    "          <div class=\"row\">\n" +
+    "            <strong>Log My Rocket</strong>\n" +
+    "          </div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <small><strong>Model Rocket Flight Log</strong></small>\n" +
+    "          </div>\n" +
+    "        </h2>\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-4 text-right hidden-xs\">\n" +
+    "        <img class=\"logo pull-right\" src=\"static/img/logo.jpg\" alt=\"Log My Rocket\">\n" +
+    "      </div>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer panel-group\">\n" +
     "    <div class=\"row alert alert-warning\" ng-show=\"authReason\">\n" +
@@ -15,43 +28,51 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "      {{authError}}\n" +
     "    </div>\n" +
     "    <div class=\"row\">\n" +
-    "      <div class=\"col-sm-6 panel panel-default\">\n" +
-    "        <div class=\"panel-body\">\n" +
-    "          <div class=\"row text-left\">\n" +
-    "            <ul class=\"list-group\">\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Track your fleet of model rockets.\n" +
-    "              </li>\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Keep track of your motor inventory.\n" +
-    "              </li>\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Track each flight and record flight details.\n" +
-    "              </li>\n" +
-    "            </ul>\n" +
-    "          </div>\n" +
-    "          <div class=\"row text-left\">\n" +
-    "            <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
-    "          </div>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "      <div class=\"col-sm-2\">\n" +
-    "\n" +
-    "      </div>\n" +
-    "      <div class=\"col-sm-4 form-group panel panel-default\">\n" +
-    "        <div class=\"panel-body\">\n" +
-    "          <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
-    "          <div class=\"row\">\n" +
-    "            <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
-    "          </div>\n" +
-    "          <div class=\"row\">\n" +
-    "            <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
-    "          </div>\n" +
-    "          <div class=\"row text-center\">\n" +
-    "            <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "      <div class=\"col-sm-8\">\n" +
+    "        <div class=\"panel panel-default\">\n" +
+    "          <div class=\"panel-body\">\n" +
+    "            <div class=\"col-sm-12 center-block\">\n" +
+    "              <div class=\"row text-left\">\n" +
+    "                <ul class=\"list-group\">\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track your fleet of model rockets\n" +
+    "                  </li>\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track your rocket motor inventory\n" +
+    "                  </li>\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track each flight and record flight details\n" +
+    "                  </li>\n" +
+    "                </ul>\n" +
+    "              </div>\n" +
+    "              <div class=\"row text-left\">\n" +
+    "                <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
     "          </div>\n" +
     "        </div>\n" +
     "      </div>\n" +
+    "      <div class=\"col-sm-4\">\n" +
+    "        <div class=\"form-group panel panel-default\">\n" +
+    "          <div class=\"panel-body\">\n" +
+    "            <div class=\"col-sm-12 center-block\">\n" +
+    "              <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
+    "              <div class=\"row\">\n" +
+    "                <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
+    "              </div>\n" +
+    "              <div class=\"row\">\n" +
+    "                <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
+    "              </div>\n" +
+    "              <div class=\"row text-center\">\n" +
+    "                <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row text-center hidden-xs\">\n" +
+    "      <span class=\"text-muted\"><a href='http://www.freepik.com/free-vector/startup-rocket-launch_764880.htm'>Logo Image Designed by Freepik</a></span>\n" +
     "    </div>\n" +
     "  </div>\n" +
     "</form>");
@@ -86,16 +107,6 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
-    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
-    "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"myMotors()\">Motors</button>\n" +
-    "      </form>\n" +
-    "  </li>\n" +
-    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
-    "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"settings()\">Settings</button>\n" +
-    "      </form>\n" +
-    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"logout()\">Log out</button>\n" +

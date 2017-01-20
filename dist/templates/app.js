@@ -311,9 +311,12 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "        <!-- Collect the nav links, forms, and other content for toggling -->\n" +
     "        <div id=\"navbar\" class=\"collapse navbar-collapse\">\n" +
     "          <ul class=\"nav navbar-nav\">\n" +
-    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">Rockets</a></li>\n" +
-    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">Flights</a></li>\n" +
-    "\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">Rockets</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/rockets/add-rocket')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets/add-rocket\">Add Rocket</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">Flights</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/flight/new-flight')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights/new-flight\">New Flight</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/motors')}\" ng-show=\"isAuthenticated()\"><a href=\"/motors\">Motors</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/settings')}\" ng-show=\"isAuthenticated()\"><a href=\"/settings\">Settings</a></li>\n" +
     "            <li>\n" +
     "              <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
     "                <li class=\"divider-vertical\"></li>\n" +
@@ -321,28 +324,19 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "              </ul>\n" +
     "            </li>\n" +
     "          </ul>\n" +
-    "\n" +
-    "          <ul class=\"nav navbar-nav navbar-left\">\n" +
-    "            <li ng-show=\"isAuthenticated()\">\n" +
-    "              <form class=\"navbar-form\">\n" +
-    "                <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "                <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
-    "              </form>\n" +
-    "            </li>\n" +
-    "          </ul>\n" +
     "          <login-toolbar></login-toolbar>\n" +
     "        </div>\n" +
-    "        <div>\n" +
-    "            <ul class=\"breadcrumb\">\n" +
-    "                <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
-    "                    <span class=\"divider\">/</span>\n" +
-    "                    <ng-switch on=\"$last\">\n" +
-    "                        <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
-    "                        <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
-    "                    </ng-switch>\n" +
-    "                </li>\n" +
-    "            </ul>\n" +
-    "        </div>\n" +
+    "        <!--<div>-->\n" +
+    "            <!--<ul class=\"breadcrumb\">-->\n" +
+    "                <!--<li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">-->\n" +
+    "                    <!--<span class=\"divider\">/</span>-->\n" +
+    "                    <!--<ng-switch on=\"$last\">-->\n" +
+    "                        <!--<span ng-switch-when=\"true\">{{breadcrumb.name}}</span>-->\n" +
+    "                        <!--<span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>-->\n" +
+    "                    <!--</ng-switch>-->\n" +
+    "                <!--</li>-->\n" +
+    "            <!--</ul>-->\n" +
+    "        <!--</div>-->\n" +
     "      </div>\n" +
     "    </nav>\n" +
     "  </div>\n" +
@@ -353,7 +347,7 @@ angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($te
   $templateCache.put("myMotors/list.tpl.html",
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <div class=\"row\">\n" +
+    "    <div class=\"row text-center\">\n" +
     "      <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
     "        Add Motor\n" +
     "      </button>\n" +

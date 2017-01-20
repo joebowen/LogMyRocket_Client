@@ -1,7 +1,20 @@
 <form name="form" novalidate class="login-form">
   <div class="modal-header">
-    <h2>Log My Rocket</h2>
-    <h4>Model Rocket Flight Log</h4>
+    <div class="col-sm-12 intro-header">
+      <div class="col-sm-8">
+        <h2>
+          <div class="row">
+            <strong>Log My Rocket</strong>
+          </div>
+          <div class="row">
+            <small><strong>Model Rocket Flight Log</strong></small>
+          </div>
+        </h2>
+      </div>
+      <div class="col-sm-4 text-right hidden-xs">
+        <img class="logo pull-right" src="static/img/logo.jpg" alt="Log My Rocket">
+      </div>
+    </div>
   </div>
   <div class="modal-footer panel-group">
     <div class="row alert alert-warning" ng-show="authReason">
@@ -11,43 +24,51 @@
       {{authError}}
     </div>
     <div class="row">
-      <div class="col-sm-6 panel panel-default">
-        <div class="panel-body">
-          <div class="row text-left">
-            <ul class="list-group">
-              <li class="list-group-item">
-                Track your fleet of model rockets.
-              </li>
-              <li class="list-group-item">
-                Keep track of your motor inventory.
-              </li>
-              <li class="list-group-item">
-                Track each flight and record flight details.
-              </li>
-            </ul>
-          </div>
-          <div class="row text-left">
-            <button class="btn btn-primary" ng-click="showSignup()">Sign Up!</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-2">
-
-      </div>
-      <div class="col-sm-4 form-group panel panel-default">
-        <div class="panel-body">
-          <div class="row alert alert-info text-center">Welcome back</div>
-          <div class="row">
-            <input class="col-lg-12 form-control" name="login" type="text" ng-model="user.username" placeholder="Username" required autofocus>
-          </div>
-          <div class="row">
-            <input class="col-lg-12 form-control" name="pass" type="password" ng-model="user.password" placeholder="Password"  required>
-          </div>
-          <div class="row text-center">
-            <button class="btn btn-primary login" ng-click="login()">Sign in</button>
+      <div class="col-sm-8">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="col-sm-12 center-block">
+              <div class="row text-left">
+                <ul class="list-group">
+                  <li class="list-group-item">
+                    Track your fleet of model rockets
+                  </li>
+                  <li class="list-group-item">
+                    Track your rocket motor inventory
+                  </li>
+                  <li class="list-group-item">
+                    Track each flight and record flight details
+                  </li>
+                </ul>
+              </div>
+              <div class="row text-left">
+                <button class="btn btn-primary" ng-click="showSignup()">Sign Up!</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="col-sm-4">
+        <div class="form-group panel panel-default">
+          <div class="panel-body">
+            <div class="col-sm-12 center-block">
+              <div class="row alert alert-info text-center">Welcome back</div>
+              <div class="row">
+                <input class="col-lg-12 form-control" name="login" type="text" ng-model="user.username" placeholder="Username" required autofocus>
+              </div>
+              <div class="row">
+                <input class="col-lg-12 form-control" name="pass" type="password" ng-model="user.password" placeholder="Password"  required>
+              </div>
+              <div class="row text-center">
+                <button class="btn btn-primary login" ng-click="login()">Sign in</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center hidden-xs">
+      <span class="text-muted"><a href='http://www.freepik.com/free-vector/startup-rocket-launch_764880.htm'>Logo Image Designed by Freepik</a></span>
     </div>
   </div>
 </form>

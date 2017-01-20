@@ -1,4 +1,4 @@
-/*! LogMyRocket - v0.0.1-SNAPSHOT - 2017-01-17
+/*! LogMyRocket - v0.0.1-SNAPSHOT - 2017-01-19
  * https://github.com/joebowen/LogMyRocket_Client
  * Copyright (c) 2017 Joe Bowen;
  * Licensed MIT
@@ -145,6 +145,10 @@ angular.module('app').controller('HeaderCtrl', ['$scope', '$location', '$route',
 
   $scope.hasPendingRequests = function () {
     return httpRequestTracker.hasPendingRequests();
+  };
+  
+  $scope.isCurrentPath = function (path) {
+    return $location.path() == path;
   };
 }]);
 angular.module('editRocket', ['resources.rockets'])
@@ -1010,12 +1014,6 @@ angular.module('security.login.toolbar', [])
       }, function(currentUser) {
         $scope.currentUser = currentUser;
       });
-      $scope.settings = function() {
-        $location.path('/settings');
-      };
-      $scope.myMotors = function() {
-        $location.path('/motors');
-      };
     }
   };
   return directive;
@@ -1907,9 +1905,12 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "        <!-- Collect the nav links, forms, and other content for toggling -->\n" +
     "        <div id=\"navbar\" class=\"collapse navbar-collapse\">\n" +
     "          <ul class=\"nav navbar-nav\">\n" +
-    "            <li ng-class=\"{active:isNavbarActive('rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">Rockets</a></li>\n" +
-    "            <li ng-class=\"{active:isNavbarActive('flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">Flights</a></li>\n" +
-    "\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/rockets')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets\">Rockets</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/rockets/add-rocket')}\" ng-show=\"isAuthenticated()\"><a href=\"/rockets/add-rocket\">Add Rocket</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/flights')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights\">Flights</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/flight/new-flight')}\" ng-show=\"isAuthenticated()\"><a href=\"/flights/new-flight\">New Flight</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/motors')}\" ng-show=\"isAuthenticated()\"><a href=\"/motors\">Motors</a></li>\n" +
+    "            <li ng-class=\"{active:isCurrentPath('/settings')}\" ng-show=\"isAuthenticated()\"><a href=\"/settings\">Settings</a></li>\n" +
     "            <li>\n" +
     "              <ul class=\"nav\" ng-show=\"hasPendingRequests()\">\n" +
     "                <li class=\"divider-vertical\"></li>\n" +
@@ -1917,28 +1918,19 @@ angular.module("header.tpl.html", []).run(["$templateCache", function($templateC
     "              </ul>\n" +
     "            </li>\n" +
     "          </ul>\n" +
-    "\n" +
-    "          <ul class=\"nav navbar-nav navbar-left\">\n" +
-    "            <li ng-show=\"isAuthenticated()\">\n" +
-    "              <form class=\"navbar-form\">\n" +
-    "                <a class=\"btn btn-default\" href=\"/rockets/add-rocket\">Add Rocket</a>\n" +
-    "                <a class=\"btn btn-default\" href=\"/flights/new-flight\">New Flight</a>\n" +
-    "              </form>\n" +
-    "            </li>\n" +
-    "          </ul>\n" +
     "          <login-toolbar></login-toolbar>\n" +
     "        </div>\n" +
-    "        <div>\n" +
-    "            <ul class=\"breadcrumb\">\n" +
-    "                <li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">\n" +
-    "                    <span class=\"divider\">/</span>\n" +
-    "                    <ng-switch on=\"$last\">\n" +
-    "                        <span ng-switch-when=\"true\">{{breadcrumb.name}}</span>\n" +
-    "                        <span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>\n" +
-    "                    </ng-switch>\n" +
-    "                </li>\n" +
-    "            </ul>\n" +
-    "        </div>\n" +
+    "        <!--<div>-->\n" +
+    "            <!--<ul class=\"breadcrumb\">-->\n" +
+    "                <!--<li ng-repeat=\"breadcrumb in breadcrumbs.getAll()\">-->\n" +
+    "                    <!--<span class=\"divider\">/</span>-->\n" +
+    "                    <!--<ng-switch on=\"$last\">-->\n" +
+    "                        <!--<span ng-switch-when=\"true\">{{breadcrumb.name}}</span>-->\n" +
+    "                        <!--<span ng-switch-default><a href=\"{{breadcrumb.path}}\">{{breadcrumb.name}}</a></span>-->\n" +
+    "                    <!--</ng-switch>-->\n" +
+    "                <!--</li>-->\n" +
+    "            <!--</ul>-->\n" +
+    "        <!--</div>-->\n" +
     "      </div>\n" +
     "    </nav>\n" +
     "  </div>\n" +
@@ -1949,7 +1941,7 @@ angular.module("myMotors/list.tpl.html", []).run(["$templateCache", function($te
   $templateCache.put("myMotors/list.tpl.html",
     "<form class=\"form-horizontal\" role=\"form\">\n" +
     "  <div class=\"form-group\">\n" +
-    "    <div class=\"row\">\n" +
+    "    <div class=\"row text-center\">\n" +
     "      <button ng-click=\"openMotorChooser()\" class=\"btn btn-primary\">\n" +
     "        Add Motor\n" +
     "      </button>\n" +
@@ -2237,8 +2229,21 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
   $templateCache.put("security/login/form.tpl.html",
     "<form name=\"form\" novalidate class=\"login-form\">\n" +
     "  <div class=\"modal-header\">\n" +
-    "    <h2>Log My Rocket</h2>\n" +
-    "    <h4>Model Rocket Flight Log</h4>\n" +
+    "    <div class=\"col-sm-12 intro-header\">\n" +
+    "      <div class=\"col-sm-8\">\n" +
+    "        <h2>\n" +
+    "          <div class=\"row\">\n" +
+    "            <strong>Log My Rocket</strong>\n" +
+    "          </div>\n" +
+    "          <div class=\"row\">\n" +
+    "            <small><strong>Model Rocket Flight Log</strong></small>\n" +
+    "          </div>\n" +
+    "        </h2>\n" +
+    "      </div>\n" +
+    "      <div class=\"col-sm-4 text-right hidden-xs\">\n" +
+    "        <img class=\"logo pull-right\" src=\"static/img/logo.jpg\" alt=\"Log My Rocket\">\n" +
+    "      </div>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"modal-footer panel-group\">\n" +
     "    <div class=\"row alert alert-warning\" ng-show=\"authReason\">\n" +
@@ -2248,43 +2253,51 @@ angular.module("security/login/form.tpl.html", []).run(["$templateCache", functi
     "      {{authError}}\n" +
     "    </div>\n" +
     "    <div class=\"row\">\n" +
-    "      <div class=\"col-sm-6 panel panel-default\">\n" +
-    "        <div class=\"panel-body\">\n" +
-    "          <div class=\"row text-left\">\n" +
-    "            <ul class=\"list-group\">\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Track your fleet of model rockets.\n" +
-    "              </li>\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Keep track of your motor inventory.\n" +
-    "              </li>\n" +
-    "              <li class=\"list-group-item\">\n" +
-    "                Track each flight and record flight details.\n" +
-    "              </li>\n" +
-    "            </ul>\n" +
-    "          </div>\n" +
-    "          <div class=\"row text-left\">\n" +
-    "            <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
-    "          </div>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "      <div class=\"col-sm-2\">\n" +
-    "\n" +
-    "      </div>\n" +
-    "      <div class=\"col-sm-4 form-group panel panel-default\">\n" +
-    "        <div class=\"panel-body\">\n" +
-    "          <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
-    "          <div class=\"row\">\n" +
-    "            <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
-    "          </div>\n" +
-    "          <div class=\"row\">\n" +
-    "            <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
-    "          </div>\n" +
-    "          <div class=\"row text-center\">\n" +
-    "            <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "      <div class=\"col-sm-8\">\n" +
+    "        <div class=\"panel panel-default\">\n" +
+    "          <div class=\"panel-body\">\n" +
+    "            <div class=\"col-sm-12 center-block\">\n" +
+    "              <div class=\"row text-left\">\n" +
+    "                <ul class=\"list-group\">\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track your fleet of model rockets\n" +
+    "                  </li>\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track your rocket motor inventory\n" +
+    "                  </li>\n" +
+    "                  <li class=\"list-group-item\">\n" +
+    "                    Track each flight and record flight details\n" +
+    "                  </li>\n" +
+    "                </ul>\n" +
+    "              </div>\n" +
+    "              <div class=\"row text-left\">\n" +
+    "                <button class=\"btn btn-primary\" ng-click=\"showSignup()\">Sign Up!</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
     "          </div>\n" +
     "        </div>\n" +
     "      </div>\n" +
+    "      <div class=\"col-sm-4\">\n" +
+    "        <div class=\"form-group panel panel-default\">\n" +
+    "          <div class=\"panel-body\">\n" +
+    "            <div class=\"col-sm-12 center-block\">\n" +
+    "              <div class=\"row alert alert-info text-center\">Welcome back</div>\n" +
+    "              <div class=\"row\">\n" +
+    "                <input class=\"col-lg-12 form-control\" name=\"login\" type=\"text\" ng-model=\"user.username\" placeholder=\"Username\" required autofocus>\n" +
+    "              </div>\n" +
+    "              <div class=\"row\">\n" +
+    "                <input class=\"col-lg-12 form-control\" name=\"pass\" type=\"password\" ng-model=\"user.password\" placeholder=\"Password\"  required>\n" +
+    "              </div>\n" +
+    "              <div class=\"row text-center\">\n" +
+    "                <button class=\"btn btn-primary login\" ng-click=\"login()\">Sign in</button>\n" +
+    "              </div>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </div>\n" +
+    "    <div class=\"row text-center hidden-xs\">\n" +
+    "      <span class=\"text-muted\"><a href='http://www.freepik.com/free-vector/startup-rocket-launch_764880.htm'>Logo Image Designed by Freepik</a></span>\n" +
     "    </div>\n" +
     "  </div>\n" +
     "</form>");
@@ -2319,16 +2332,6 @@ angular.module("security/login/toolbar.tpl.html", []).run(["$templateCache", fun
   $templateCache.put("security/login/toolbar.tpl.html",
     "<ul class=\"nav navbar-nav navbar-right\">\n" +
     "  <li class=\"divider-vertical\"></li>\n" +
-    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
-    "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"myMotors()\">Motors</button>\n" +
-    "      </form>\n" +
-    "  </li>\n" +
-    "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
-    "      <form class=\"navbar-form\">\n" +
-    "          <button class=\"btn logout\" ng-click=\"settings()\">Settings</button>\n" +
-    "      </form>\n" +
-    "  </li>\n" +
     "  <li ng-show=\"isAuthenticated()\" class=\"logout\">\n" +
     "      <form class=\"navbar-form\">\n" +
     "          <button class=\"btn logout\" ng-click=\"logout()\">Log out</button>\n" +

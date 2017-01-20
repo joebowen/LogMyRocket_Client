@@ -86,4 +86,8 @@ angular.module('app').controller('HeaderCtrl', ['$scope', '$location', '$route',
   $scope.hasPendingRequests = function () {
     return httpRequestTracker.hasPendingRequests();
   };
+
+  $scope.isCurrentPath = function (path) {
+    return $location.path() == path;
+  };
 }]);

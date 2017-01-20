@@ -17,12 +17,6 @@ angular.module('security.login.toolbar', [])
       }, function(currentUser) {
         $scope.currentUser = currentUser;
       });
-      $scope.settings = function() {
-        $location.path('/settings');
-      };
-      $scope.myMotors = function() {
-        $location.path('/motors');
-      };
     }
   };
   return directive;
